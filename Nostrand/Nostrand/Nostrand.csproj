@@ -32,6 +32,7 @@
     <Compile Include="Nostrand.cs" />
     <Compile Include="Terminal.cs" />
     <Compile Include="getline.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Clojure">
@@ -39,4 +40,10 @@
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Target Name="BeforeBuild">
+    <Exec Command="$(ProjectDir)patch-assembly-info.sh" />
+  </Target>
+  <Target Name="AfterBuild">
+    <Exec Command="$(ProjectDir)unpatch-assembly-info.sh" />
+  </Target>
 </Project>
