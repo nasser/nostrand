@@ -33,11 +33,15 @@
     <Compile Include="Terminal.cs" />
     <Compile Include="getline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks.cs" />
+    <Compile Include="ReplTask.cs" />
+    <Compile Include="VersionTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Clojure">
       <HintPath>..\..\..\..\Scratch\ilrepack\Clojure.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">

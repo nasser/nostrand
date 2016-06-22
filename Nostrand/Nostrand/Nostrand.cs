@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 using clojure.lang;
-using Mono.Terminal;
 
 namespace Nostrand
 {
+
 	public class Nostrand
 	{
 
@@ -20,51 +21,57 @@ namespace Nostrand
 			return asm.GetName().Version + " " + asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 		}
 
+		static Dictionary<string, Type> Tasks()
+		{
+			var mscorlibAssembly = Assembly.Load("mscorlib");
+			var clojureAssembly = Assembly.Load("Clojure");
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where((assembly) => assembly != mscorlibAssembly && assembly != clojureAssembly);
+			var types = assemblies.SelectMany((assembly) => assembly.GetTypes());
+			var tasks = types.Where((type) => type.GetCustomAttribute<TaskAttribute>() != null).
+							 ToDictionary((type) => type.GetCustomAttribute<TaskAttribute>().Name);
+			return tasks;
+		}
+
 		public static void Main(string[] args)
 		{
-			Terminal.Message("Nostrand", Version());
-			Terminal.Message("Mono", GetMonoVersion());
-			Console.WriteLine();
-			// Terminal.Message ("Clojure", RT.var("clojure.core", "clojure-version").invoke());
+			if (args.Length > 0)
+			{
+				new Thread(() => {
+					RT.load("clojure/core");
+					RT.load("clojure/repl");
+				}).Start();
 
-			if(args.Length > 0) {
-				var task = args[0];
-				var taskParts = task.Split('/');
-				var taskNS = taskParts[0];
-				var taskVar = taskParts[1];
-				RT.load(taskNS.Replace('.', '/'));
-				RT.var(taskNS, taskVar).invoke();
+				var tasks = Tasks();
+				Type taskType;
+				if (tasks.TryGetValue(args[0], out taskType))
+				{
+					// c# task
+					var task = (ITask)Activator.CreateInstance(taskType);
+					task.Invoke(args.Skip(1).ToArray());
+				}
+				else
+				{
+					// clojure task
+					try
+					{
+						var taskName = args[0];
+						var taskParts = taskName.Split('/');
+						var taskNS = taskParts[0];
+						var taskVar = taskParts[1];
+						RT.load(taskNS.Replace('.', '/'));
+						RT.var(taskNS, taskVar).invoke();
+					}
+					catch (System.NullReferenceException)
+					{
+
+					}
+				}
 			}
-
-			LineEditor le = new LineEditor("nostrand");
-			le.AutoCompleteEvent += delegate (string a, int pos)
+			else
 			{
-				string prefix = "";
-				var completions = new string[] { "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten" };
-				return new Mono.Terminal.LineEditor.Completion(prefix, completions);
-			};
-
-			string s;
-
-			new Thread(() => RT.load("clojure/core")).Start();
-
-			while ((s = le.Edit("clojure.core> ", "")) != null)
-			{
-				try
-				{
-					var readResult = RT.var("clojure.core", "read-string").invoke(s);
-					var evaledResult = RT.var("clojure.core", "eval").invoke(readResult);
-					var stringResult = RT.var("clojure.core", "pr-str").invoke(evaledResult).ToString();
-					Terminal.Message(stringResult, ConsoleColor.Gray);
-				}
-				catch (System.IO.EndOfStreamException)
-				{
-
-				}
-				catch (Exception e)
-				{
-					Terminal.Message("Exception", e.ToString(), ConsoleColor.Yellow);
-				}
+				Terminal.Message("Nostrand", Version());
+				Terminal.Message("Mono", GetMonoVersion());
+				Terminal.Message("Clojure", RT.var("clojure.core", "clojure-version").invoke());
 			}
 		}
 	}
