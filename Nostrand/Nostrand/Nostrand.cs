@@ -58,7 +58,7 @@ namespace Nostrand
 						var taskNS = taskParts[0];
 						var taskVar = taskParts[1];
 						RT.load(taskNS.Replace('.', '/'));
-						RT.var(taskNS, taskVar).invoke();
+						AFn.ApplyToHelper(RT.var(taskNS, taskVar), new TypedArraySeq<string>(null, args.Skip(1).ToArray(), 0));
 					}
 					catch (System.NullReferenceException)
 					{
