@@ -21,14 +21,13 @@ namespace Nostrand
 			return asm.GetName().Version + " " + asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 		}
 
-		static Dictionary<string, Type> Tasks()
+		static Dictionary<string, Type> Tasks(params string[] ignoring)
 		{
-			var mscorlibAssembly = Assembly.Load("mscorlib");
-			var clojureAssembly = Assembly.Load("Clojure");
-			var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where((assembly) => assembly != mscorlibAssembly && assembly != clojureAssembly);
-			var types = assemblies.SelectMany((assembly) => assembly.GetTypes());
-			var tasks = types.Where((type) => type.GetCustomAttribute<TaskAttribute>() != null).
-							 ToDictionary((type) => type.GetCustomAttribute<TaskAttribute>().Name);
+			var ignoredAssemblies = ignoring.Select(s => Assembly.Load(s));
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(assembly => !ignoredAssemblies.Contains(assembly));
+			var types = assemblies.SelectMany(assembly => assembly.GetTypes());
+			var tasks = types.Where(type => type.GetCustomAttribute<TaskAttribute>() != null).
+							 ToDictionary(type => type.GetCustomAttribute<TaskAttribute>().Name);
 			return tasks;
 		}
 
@@ -41,7 +40,7 @@ namespace Nostrand
 					RT.load("clojure/repl");
 				}).Start();
 
-				var tasks = Tasks();
+				var tasks = Tasks("mscorlib", "Clojure");
 				Type taskType;
 				if (tasks.TryGetValue(args[0], out taskType))
 				{
