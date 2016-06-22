@@ -16,7 +16,7 @@ namespace Nostrand
 			if (firstPrompt)
 			{
 				firstPrompt = false;
-				return "      ";
+				return "user> ";
 			}
 
 			return ((Namespace)RT.CurrentNSVar.deref()).Name.Name + "> ";
@@ -37,8 +37,6 @@ namespace Nostrand
 			};
 
 			string s;
-			Console.Write("user> ");
-
 			s = le.Edit(Prompt(), "");
 
 			Var.pushThreadBindings(
