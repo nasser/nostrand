@@ -1,1 +1,0 @@
-sed -i -pe "s/AssemblyInformationalVersion.*/AssemblyInformationalVersion(\"\")]/g" Properties/AssemblyInfo.cs
