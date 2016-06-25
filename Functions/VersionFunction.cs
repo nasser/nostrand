@@ -1,8 +1,8 @@
 ﻿using clojure.lang;
 namespace Nostrand
 {
-	[Task("version")]
-	public class VersionTask : AFn
+	[Function("version")]
+	public class VersionFunction : AFn
 	{
 		public override object invoke()
 		{

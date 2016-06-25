@@ -18,13 +18,13 @@ user>
 ## Usage
 
 ```
-nos TASK [ARGUMENT...]
+nos FUNCTION [ARGUMENT...]
 ```
 
-Nostrand runs tasks. A task is either a Clojure function, or defined in C#. Some tasks are built in.
+Nostrand does one thing: it runs a function. A function is either a Clojure function, or defined in C#. Some functions are built in.
 
 ```
-$ nos help
+$ nos version
 Nostrand 0.0.1.33392 (master/9e61e2f* Wed Jun 22 18:33:04 EDT 2016)
 Mono 4.4.1 (mono-4.4.0-branch-c7sr0/4747417 Mon Jun 20 15:43:48 EDT 2016)
 Clojure 1.7.0-master-SNAPSHOT
@@ -33,7 +33,7 @@ $ nos repl
 user> 
 ```
 
-In the future, you will be able to provide Nostrand with compiled tasks written in C#.
+In the future, you will be able to provide Nostrand with compiled functions written in C#.
 
 But Nostrand is primarly meant to run namespace-qualified Clojure functions.
 
@@ -49,14 +49,14 @@ foobar: 3
 foobar: 4
 ```
 
-Additional arguments are passed to the function.
+Additional command line arguments are passed to the function.
 
 ```
 $ cat foo.clj
 (ns foo)
 (defn bar [i]
   (dotimes [j (int i)] (println (str "foobar: " j))))
-$ nos foo/bar
+$ nos foo/bar 10
 foobar: 0
 foobar: 1
 foobar: 2

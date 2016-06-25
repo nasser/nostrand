@@ -26,8 +26,8 @@ namespace Nostrand
 			var ignoredAssemblies = ignoring.Select(s => Assembly.Load(s));
 			var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(assembly => !ignoredAssemblies.Contains(assembly));
 			var types = assemblies.SelectMany(assembly => assembly.GetTypes());
-			var tasks = types.Where(type => type.GetCustomAttribute<TaskAttribute>() != null).
-							 ToDictionary(type => type.GetCustomAttribute<TaskAttribute>().Name);
+			var tasks = types.Where(type => type.GetCustomAttribute<FunctionAttribute>() != null).
+							 ToDictionary(type => type.GetCustomAttribute<FunctionAttribute>().Name);
 			return tasks;
 		}
 

@@ -7,8 +7,8 @@ using clojure.lang;
 
 namespace Nostrand
 {
-	[Task("repl")]
-	public class ReplTask : AFn
+	[Function("repl")]
+	public class ReplFunction : AFn
 	{
 		bool firstPrompt = true;
 		string Prompt()
