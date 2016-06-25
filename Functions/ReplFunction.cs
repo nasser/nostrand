@@ -36,12 +36,13 @@ namespace Nostrand
 				return new LineEditor.Completion(prefix, completions);
 			};
 
+			string s;
+			s = le.Edit(Prompt(), "");
+
+
 			var readStringFn = (IFn)RT.var("clojure.core", "read-string").getRawRoot();
 			var evalFn = (IFn)RT.var("clojure.core", "eval").getRawRoot();
 			var prStrFn = (IFn)RT.var("clojure.core", "pr-str").getRawRoot();
-
-			string s;
-			s = le.Edit(Prompt(), "");
 
 			Var.pushThreadBindings(
 				RT.mapUniqueKeys(RT.CurrentNSVar, Namespace.findOrCreate(Symbol.intern("user")),
