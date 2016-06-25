@@ -36,6 +36,10 @@ namespace Nostrand
 				return new LineEditor.Completion(prefix, completions);
 			};
 
+			var readStringFn = (IFn)RT.var("clojure.core", "read-string").getRawRoot();
+			var evalFn = (IFn)RT.var("clojure.core", "eval").getRawRoot();
+			var prStrFn = (IFn)RT.var("clojure.core", "pr-str").getRawRoot();
+
 			string s;
 			s = le.Edit(Prompt(), "");
 
@@ -48,9 +52,9 @@ namespace Nostrand
 			{
 				try
 				{
-					var readResult = RT.var("clojure.core", "read-string").invoke(s);
-					var evaledResult = RT.var("clojure.core", "eval").invoke(readResult);
-					var stringResult = RT.var("clojure.core", "pr-str").invoke(evaledResult).ToString();
+					var readResult = readStringFn.invoke(s);
+					var evaledResult = evalFn.invoke(readResult);
+					var stringResult = prStrFn.invoke(evaledResult).ToString();
 					Terminal.Message(stringResult, ConsoleColor.Gray);
 				}
 				catch (System.IO.EndOfStreamException)
