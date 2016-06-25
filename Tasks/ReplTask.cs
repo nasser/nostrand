@@ -8,7 +8,7 @@ using clojure.lang;
 namespace Nostrand
 {
 	[Task("repl")]
-	public class ReplTask : ITask
+	public class ReplTask : AFn
 	{
 		bool firstPrompt = true;
 		string Prompt()
@@ -21,9 +21,9 @@ namespace Nostrand
 
 			return ((Namespace)RT.CurrentNSVar.deref()).Name.Name + "> ";
 		}
-		public virtual void Invoke(string[] args)
+
+		public override object invoke()
 		{
-			PersistentHashMap.create(args);
 			LineEditor le = new LineEditor("nostrand");
 			le.AutoCompleteEvent += (string prefix, int pos) =>
 			{
@@ -64,6 +64,8 @@ namespace Nostrand
 			} while ((s = le.Edit(Prompt(), "")) != null);
 
 			Var.popThreadBindings();
+
+			return null;
 		}
 	}
 }

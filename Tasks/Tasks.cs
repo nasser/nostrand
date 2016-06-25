@@ -10,10 +10,4 @@ namespace Nostrand
 			Name = name;
 		}
 	}
-
-	public interface ITask
-	{
-		void Invoke(string[] args);
-	}
-
 }

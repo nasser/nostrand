@@ -2,13 +2,15 @@
 namespace Nostrand
 {
 	[Task("version")]
-	public class VersionTask : ITask
+	public class VersionTask : AFn
 	{
-		public void Invoke(string[] args)
+		public override object invoke()
 		{
 			Terminal.Message("Nostrand", Nostrand.Version());
 			Terminal.Message("Mono", Nostrand.GetMonoVersion());
 			Terminal.Message("Clojure", RT.var("clojure.core", "clojure-version").invoke());
+
+			return null;
 		}
 	}
 }

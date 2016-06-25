@@ -40,31 +40,53 @@ namespace Nostrand
 					RT.load("clojure/repl");
 				}).Start();
 
+				IFn fn = null;
+
 				var tasks = Tasks("mscorlib", "Clojure");
 				Type taskType;
 				if (tasks.TryGetValue(args[0], out taskType))
 				{
 					// c# task
-					var task = (ITask)Activator.CreateInstance(taskType);
-					task.Invoke(args.Skip(1).ToArray());
+					fn = (IFn)Activator.CreateInstance(taskType);
 				}
 				else
 				{
 					// clojure task
 					try
 					{
-						var taskName = args[0];
-						var taskParts = taskName.Split('/');
-						var taskNS = taskParts[0];
-						var taskVar = taskParts[1];
-						RT.load(taskNS.Replace('.', '/'));
-						AFn.ApplyToHelper(RT.var(taskNS, taskVar), new TypedArraySeq<string>(null, args.Skip(1).ToArray(), 0));
+						if (args[0].Contains("/"))
+						{
+							var taskName = args[0];
+							var taskParts = taskName.Split('/');
+							var taskNS = taskParts[0];
+							var taskVarName = taskParts[1];
+							RT.load(taskNS.Replace('.', '/'));
+							fn = RT.var(taskNS, taskVarName);
+						}
 					}
-					catch (System.NullReferenceException)
+					catch (NullReferenceException)
 					{
 
 					}
 				}
+
+				if (fn == null)
+				{
+					Terminal.Message("Quiting", "could not find function named `" + args[0] + "'", ConsoleColor.Yellow);
+				}
+				else
+				{
+
+					if (args.Length > 1)
+					{
+						AFn.ApplyToHelper(fn, RT.seq(args.Skip(1)));
+					}
+					else
+					{
+						fn.invoke();
+					}
+				}
+
 			}
 			else
 			{
