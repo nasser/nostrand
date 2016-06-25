@@ -36,6 +36,7 @@
     <Compile Include="Functions\ReplFunction.cs" />
     <Compile Include="Functions\Functions.cs" />
     <Compile Include="Functions\VersionFunction.cs" />
+    <Compile Include="Functions\SocketReplFunction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

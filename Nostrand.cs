@@ -12,6 +12,40 @@ namespace Nostrand
 	public class Nostrand
 	{
 
+		public static IFn FindFunction(string name)
+		{
+			IFn fn;
+			var tasks = Tasks("mscorlib", "Clojure");
+			Type taskType;
+			if (tasks.TryGetValue(name, out taskType))
+			{
+				// c# task
+				return (IFn)Activator.CreateInstance(taskType);
+			}
+			else
+			{
+				// clojure task
+				try
+				{
+					if (name.Contains("/"))
+					{
+						var taskName = name;
+						var taskParts = taskName.Split('/');
+						var taskNS = taskParts[0];
+						var taskVarName = taskParts[1];
+						RT.load(taskNS.Replace('.', '/'));
+						return RT.var(taskNS, taskVarName);
+					}
+				}
+				catch (NullReferenceException)
+				{
+
+				}
+			}
+
+			return null;
+		}
+
 		[DllImport("__Internal", EntryPoint="mono_get_runtime_build_info")]
 		public extern static string GetMonoVersion();
 
@@ -40,36 +74,7 @@ namespace Nostrand
 					RT.load("clojure/repl");
 				}).Start();
 
-				IFn fn = null;
-
-				var tasks = Tasks("mscorlib", "Clojure");
-				Type taskType;
-				if (tasks.TryGetValue(args[0], out taskType))
-				{
-					// c# task
-					fn = (IFn)Activator.CreateInstance(taskType);
-				}
-				else
-				{
-					// clojure task
-					try
-					{
-						if (args[0].Contains("/"))
-						{
-							var taskName = args[0];
-							var taskParts = taskName.Split('/');
-							var taskNS = taskParts[0];
-							var taskVarName = taskParts[1];
-							RT.load(taskNS.Replace('.', '/'));
-							fn = RT.var(taskNS, taskVarName);
-						}
-					}
-					catch (NullReferenceException)
-					{
-
-					}
-				}
-
+				IFn fn = FindFunction(args[0]);
 				if (fn == null)
 				{
 					Terminal.Message("Quiting", "could not find function named `" + args[0] + "'", ConsoleColor.Yellow);
