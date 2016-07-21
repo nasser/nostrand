@@ -47,9 +47,11 @@ namespace Nostrand
 			var readStringFn = (IFn)RT.var("clojure.core", "read-string").getRawRoot();
 			var evalFn = (IFn)RT.var("clojure.core", "eval").getRawRoot();
 			var prStrFn = (IFn)RT.var("clojure.core", "pr-str").getRawRoot();
+			var sb = new StringBuilder();
 
 			Var.pushThreadBindings(
 				RT.mapUniqueKeys(
+					RT.OutVar, new StringWriter(sb),
 					RT.CurrentNSVar, Namespace.findOrCreate(Symbol.intern("user")),
 					RT.WarnOnReflectionVar, RT.WarnOnReflectionVar.deref(),
 					RT.UncheckedMathVar, RT.UncheckedMathVar.deref()));
@@ -67,6 +69,8 @@ namespace Nostrand
 						var evaledResult = evalFn.invoke(readResult);
 						var stringResult = prStrFn.invoke(evaledResult).ToString();
 						var outBytes = Encoding.UTF8.GetBytes(FormatResponse(stringResult));
+						var outVarBytes = Encoding.UTF8.GetBytes(sb.ToString());
+						socket.Send(outVarBytes, outVarBytes.Length, sender);
 						socket.Send(outBytes, outBytes.Length, sender);
 					}
 					catch (Exception e)
