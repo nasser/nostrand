@@ -9,7 +9,7 @@ using clojure.lang;
 
 namespace Nostrand
 {
-	[Function("socket-repl")]
+	[Function("repl")]
 	public class SocketReplFunction : AFn
 	{
 		const int DefaultPort = 11217;

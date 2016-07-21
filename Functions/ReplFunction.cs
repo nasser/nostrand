@@ -7,7 +7,7 @@ using clojure.lang;
 
 namespace Nostrand
 {
-	[Function("repl")]
+	[Function("cli-repl")]
 	public class ReplFunction : AFn
 	{
 		bool firstPrompt = true;
