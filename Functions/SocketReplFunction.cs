@@ -72,6 +72,7 @@ namespace Nostrand
 						var outVarBytes = Encoding.UTF8.GetBytes(sb.ToString());
 						socket.Send(outVarBytes, outVarBytes.Length, sender);
 						socket.Send(outBytes, outBytes.Length, sender);
+						sb.Clear();
 					}
 					catch (Exception e)
 					{
