@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -14,7 +15,6 @@ namespace Nostrand
 
 		public static IFn FindFunction(string name)
 		{
-			IFn fn;
 			var tasks = Tasks("mscorlib", "Clojure");
 			Type taskType;
 			if (tasks.TryGetValue(name, out taskType))
@@ -46,7 +46,7 @@ namespace Nostrand
 			return null;
 		}
 
-		[DllImport("__Internal", EntryPoint="mono_get_runtime_build_info")]
+		[DllImport("__Internal", EntryPoint = "mono_get_runtime_build_info")]
 		public extern static string GetMonoVersion();
 
 		public static string Version()
@@ -69,7 +69,8 @@ namespace Nostrand
 		{
 			if (args.Length > 0)
 			{
-				new Thread(() => {
+				new Thread(() =>
+				{
 					RT.load("clojure/core");
 					RT.load("clojure/repl");
 				}).Start();
@@ -81,10 +82,17 @@ namespace Nostrand
 				}
 				else
 				{
-
 					if (args.Length > 1)
 					{
-						AFn.ApplyToHelper(fn, RT.seq(args.Skip(1)));
+						var s = args.Skip(1)
+						            .Aggregate(new StringBuilder("{"),
+						                       (sb, o) => sb.AppendFormat("{0} ", o)).
+						            Append("}").
+						            ToString();
+						var argMap = RT.readString(s);
+						// TODO better way to do this?
+						(new SetLoadPathFunction()).invoke(argMap);
+						fn.invoke(argMap);
 					}
 					else
 					{

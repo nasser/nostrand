@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
+using System.Linq;
 using clojure.lang;
 
 namespace Nostrand
@@ -10,6 +12,7 @@ namespace Nostrand
 	[Function("socket-repl")]
 	public class SocketReplFunction : AFn
 	{
+		const int DefaultPort = 11217;
 
 		string FormatResponse(string s)
 		{
@@ -21,27 +24,26 @@ namespace Nostrand
 			return string.Format("\n{0}\n{1}> ", e, ((Namespace)RT.CurrentNSVar.deref()).Name);
 		}
 
-		public override object invoke(object portArg, object fnName)
+		public override object invoke()
 		{
-			IFn fn = Nostrand.FindFunction((string)fnName);
-			if (fn != null)
-			{
-				fn.invoke();
-			}
-
-			return invoke(portArg);
+			return StartRepl(DefaultPort);
 		}
 
-		public override object invoke(object portArg)
+		public override object invoke(object argMap)
 		{
-			int port = int.Parse((string)portArg);
+			var portArg = ((IPersistentMap)argMap).valAt(Keyword.intern("port")) ?? (long)DefaultPort;
+			int port = (int)(long)portArg;
+			return StartRepl(port);
+		}
+
+		object StartRepl(int port)
+		{
 			var socket = new UdpClient(new IPEndPoint(IPAddress.Any, port));
 			socket.Client.SendBufferSize = 1024 * 5000;
 			socket.Client.ReceiveBufferSize = 1024 * 5000;
 
 			Terminal.Message("Listening", port);
 
-			var outWriter = new StringWriter();
 			var readStringFn = (IFn)RT.var("clojure.core", "read-string").getRawRoot();
 			var evalFn = (IFn)RT.var("clojure.core", "eval").getRawRoot();
 			var prStrFn = (IFn)RT.var("clojure.core", "pr-str").getRawRoot();
@@ -49,10 +51,9 @@ namespace Nostrand
 			Var.pushThreadBindings(
 				RT.mapUniqueKeys(
 					RT.CurrentNSVar, Namespace.findOrCreate(Symbol.intern("user")),
-					RT.OutVar, outWriter,
 					RT.WarnOnReflectionVar, RT.WarnOnReflectionVar.deref(),
 					RT.UncheckedMathVar, RT.UncheckedMathVar.deref()));
-			
+
 			while (true)
 			{
 				var sender = new IPEndPoint(IPAddress.Any, 0);
@@ -66,14 +67,6 @@ namespace Nostrand
 						var evaledResult = evalFn.invoke(readResult);
 						var stringResult = prStrFn.invoke(evaledResult).ToString();
 						var outBytes = Encoding.UTF8.GetBytes(FormatResponse(stringResult));
-						var printedString = outWriter.ToString();
-						outWriter.GetStringBuilder().Clear();
-						if (printedString.Length > 0)
-						{
-							var printedBytes = Encoding.UTF8.GetBytes(printedString);
-							socket.Send(printedBytes, printedBytes.Length, sender);
-						}
-
 						socket.Send(outBytes, outBytes.Length, sender);
 					}
 					catch (Exception e)
