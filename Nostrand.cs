@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -12,9 +13,45 @@ namespace Nostrand
 
 	public class Nostrand
 	{
+		public struct Input
+		{
+			public IPersistentMap options;
+			public PersistentVector functions;
+		}
+
+		public static Input ReadArguments(string[] args)
+		{
+			var input = new Input();
+			input.options = PersistentHashMap.EMPTY;
+			input.functions = PersistentVector.EMPTY;
+
+			var argString = string.Join(" ",args);
+			var pbtr = new PushbackTextReader(new StringReader(argString));
+			for (;;)
+			{
+				try
+				{
+					var o = ArgumentReader.read(pbtr, true, null, false, null);
+					if (o is Keyword)
+					{
+						var val = ArgumentReader.read(pbtr, true, null, false, null);
+						input.options = input.options.assoc(o, val);
+					}
+					else if(o is Symbol)
+					{
+						input.functions = (PersistentVector)input.functions.cons(o);
+					}
+				}
+				catch (EndOfStreamException)
+				{
+					return input;
+				}
+			}
+		}
 
 		public static IFn FindFunction(string name)
 		{
+			// TODO stop using C# functions, they complicate things
 			var tasks = Tasks("mscorlib", "Clojure");
 			Type taskType;
 			if (tasks.TryGetValue(name, out taskType))
@@ -22,25 +59,23 @@ namespace Nostrand
 				// c# task
 				return (IFn)Activator.CreateInstance(taskType);
 			}
-			else
-			{
-				// clojure task
-				try
-				{
-					if (name.Contains("/"))
-					{
-						var taskName = name;
-						var taskParts = taskName.Split('/');
-						var taskNS = taskParts[0];
-						var taskVarName = taskParts[1];
-						RT.load(taskNS.Replace('.', '/'));
-						return RT.var(taskNS, taskVarName);
-					}
-				}
-				catch (NullReferenceException)
-				{
 
+			// clojure task
+			try
+			{
+				if (name.Contains("/"))
+				{
+					var taskName = name;
+					var taskParts = taskName.Split('/');
+					var taskNS = taskParts[0];
+					var taskVarName = taskParts[1];
+					RT.load(taskNS.Replace('.', '/'));
+					return RT.var(taskNS, taskVarName);
 				}
+			}
+			catch (NullReferenceException)
+			{
+
 			}
 
 			return null;
@@ -75,31 +110,27 @@ namespace Nostrand
 					RT.load("clojure/repl");
 				}).Start();
 
-				IFn fn = FindFunction(args[0]);
-				if (fn == null)
+				var input = ReadArguments(args);
+				object arg = input.options;
+
+				var builtinFunctions = PersistentVector.create(new SetLoadPathFunction(), new LoadAssembliesFunction());
+
+				foreach (var f in builtinFunctions)
 				{
-					Terminal.Message("Quiting", "could not find function named `" + args[0] + "'", ConsoleColor.Yellow);
-				}
-				else
-				{
-					if (args.Length > 1)
-					{
-						var s = args.Skip(1)
-						            .Aggregate(new StringBuilder("{"),
-						                       (sb, o) => sb.AppendFormat("{0} ", o)).
-						            Append("}").
-						            ToString();
-						var argMap = RT.readString(s);
-						// TODO better way to do this?
-						(new SetLoadPathFunction()).invoke(argMap);
-						fn.invoke(argMap);
-					}
-					else
-					{
-						fn.invoke();
-					}
+					arg = ((IFn)f).invoke(arg);
 				}
 
+				foreach (var f in input.functions)
+				{
+					IFn fn = FindFunction(f.ToString());
+					if (fn == null)
+					{
+						Terminal.Message("Quiting", "could not find function named `" + args[0] + "'", ConsoleColor.Yellow);
+						return;
+					}
+
+					arg = fn.invoke(arg);
+				}
 			}
 			else
 			{

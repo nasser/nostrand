@@ -22,7 +22,7 @@ namespace Nostrand
 			return ((Namespace)RT.CurrentNSVar.deref()).Name.Name + "> ";
 		}
 
-		public override object invoke()
+		public override object invoke(object argMap)
 		{
 			LineEditor le = new LineEditor("nostrand");
 			le.AutoCompleteEvent += (string prefix, int pos) =>

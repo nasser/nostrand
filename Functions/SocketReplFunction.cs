@@ -13,6 +13,7 @@ namespace Nostrand
 	public class SocketReplFunction : AFn
 	{
 		const int DefaultPort = 11217;
+		static bool running = true;
 
 		string FormatResponse(string s)
 		{
@@ -38,11 +39,17 @@ namespace Nostrand
 
 		object StartRepl(int port)
 		{
+			Console.CancelKeyPress += (sender, e) =>
+			{
+				running = false;
+			};
+
 			var socket = new UdpClient(new IPEndPoint(IPAddress.Any, port));
 			socket.Client.SendBufferSize = 1024 * 5000;
 			socket.Client.ReceiveBufferSize = 1024 * 5000;
+			socket.Client.ReceiveTimeout = 100;
 
-			Terminal.Message("Listening", port);
+			Terminal.Message("Listening", socket.Client.LocalEndPoint);
 
 			var readStringFn = (IFn)RT.var("clojure.core", "read-string").getRawRoot();
 			var evalFn = (IFn)RT.var("clojure.core", "eval").getRawRoot();
@@ -56,31 +63,40 @@ namespace Nostrand
 					RT.WarnOnReflectionVar, RT.WarnOnReflectionVar.deref(),
 					RT.UncheckedMathVar, RT.UncheckedMathVar.deref()));
 
-			while (true)
+			while (running)
 			{
 				var sender = new IPEndPoint(IPAddress.Any, 0);
-				var inBytes = socket.Receive(ref sender);
-				if (inBytes.Length > 0)
+				try
 				{
-					try
+					var inBytes = socket.Receive(ref sender);
+					if (inBytes.Length > 0)
 					{
-						var code = Encoding.UTF8.GetString(inBytes);
-						var readResult = readStringFn.invoke(code);
-						var evaledResult = evalFn.invoke(readResult);
-						var stringResult = prStrFn.invoke(evaledResult).ToString();
-						var outBytes = Encoding.UTF8.GetBytes(FormatResponse(stringResult));
-						var outVarBytes = Encoding.UTF8.GetBytes(sb.ToString());
-						socket.Send(outVarBytes, outVarBytes.Length, sender);
-						socket.Send(outBytes, outBytes.Length, sender);
-						sb.Clear();
-					}
-					catch (Exception e)
-					{
-						var exceptionBytes = Encoding.UTF8.GetBytes(FormatResponse(e));
-						socket.Send(exceptionBytes, exceptionBytes.Length, sender);
+						try
+						{
+							var code = Encoding.UTF8.GetString(inBytes);
+							var readResult = readStringFn.invoke(code);
+							var evaledResult = evalFn.invoke(readResult);
+							var stringResult = prStrFn.invoke(evaledResult).ToString();
+							var outBytes = Encoding.UTF8.GetBytes(FormatResponse(stringResult));
+							var outVarBytes = Encoding.UTF8.GetBytes(sb.ToString());
+							socket.Send(outVarBytes, outVarBytes.Length, sender);
+							socket.Send(outBytes, outBytes.Length, sender);
+							sb.Clear();
+						}
+						catch (Exception e)
+						{
+							var exceptionBytes = Encoding.UTF8.GetBytes(FormatResponse(e));
+							socket.Send(exceptionBytes, exceptionBytes.Length, sender);
+						}
 					}
 				}
+				catch (SocketException)
+				{
+					continue;
+				}
 			}
+
+			return null;
 		}
 	}
 }

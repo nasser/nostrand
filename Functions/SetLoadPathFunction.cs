@@ -9,14 +9,15 @@ namespace Nostrand
 {
 	public class SetLoadPathFunction : AFn
 	{
-		public override object invoke(object argMap)
+		public override object invoke(object options)
 		{
-			var path = ((IPersistentMap)argMap).valAt(Keyword.intern("path"));
+			var verbose = ((IPersistentMap)options).valAt(Keyword.intern("verbose"));
+			var path = ((IPersistentMap)options).valAt(Keyword.intern("load-path"));
 			if (path == null)
-				return null;
+				return options;
 
 			if (path is string ||
-				path is Symbol)
+			    path is Symbol)
 				Environment.SetEnvironmentVariable("CLOJURE_LOAD_PATH", path.ToString());
 
 			else if (path is IEnumerable<object>)
@@ -28,7 +29,12 @@ namespace Nostrand
 					                            .Append(p.ToString())).ToString();
 				Environment.SetEnvironmentVariable("CLOJURE_LOAD_PATH", loadPath);
 			}
-			return null;
+
+			if (verbose != null && ((bool)verbose) == true)
+			{
+				Terminal.Message("Load Path", Environment.GetEnvironmentVariable("CLOJURE_LOAD_PATH"), ConsoleColor.DarkBlue);
+			}
+			return options;
 		}
 	}
 }
