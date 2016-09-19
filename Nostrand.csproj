@@ -38,6 +38,8 @@
     <Compile Include="Functions\VersionFunction.cs" />
     <Compile Include="Functions\SocketReplFunction.cs" />
     <Compile Include="Functions\SetLoadPathFunction.cs" />
+    <Compile Include="ArgumentReader.cs" />
+    <Compile Include="Functions\LoadAssembliesFunction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
