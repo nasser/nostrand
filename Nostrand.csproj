@@ -19,6 +19,20 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <PlatformTarget>x86</PlatformTarget>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>BeforeBuild</type>
+          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <Optimize>true</Optimize>
@@ -27,6 +41,25 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <PlatformTarget>x86</PlatformTarget>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>BeforeBuild</type>
+          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>/bin/sh Scripts/make-bundle.sh ${TargetDir}</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Nostrand.cs" />
@@ -57,11 +90,4 @@
     <Content Include="Scripts\nos" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Target Name="BeforeBuild">
-    <Exec Command="$(ProjectDir)/Scripts/patch-assembly-info.sh" />
-  </Target>
-  <Target Name="AfterBuild">
-    <Exec Command="$(ProjectDir)/Scripts/unpatch-assembly-info.sh" />
-    <Copy SourceFiles="$(ProjectDir)/Scripts/nos" DestinationFolder="$(OutputPath)" />
-  </Target>
 </Project>
