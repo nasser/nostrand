@@ -22,9 +22,18 @@ namespace Nostrand
 			return ((Namespace)RT.CurrentNSVar.deref()).Name.Name + "> ";
 		}
 
+		public static Keyword historySizeKw = Keyword.intern("repl", "history");
+
 		public override object invoke(object argMap)
 		{
-			LineEditor le = new LineEditor("nostrand");
+			var args = (IPersistentMap)argMap;
+			long historySize = 500;
+			var historyArg = args.valAt(historySizeKw);
+			if (historyArg != null)
+			{
+				historySize = (long)historyArg;
+			}
+			LineEditor le = new LineEditor("nostrand", (int)historySize);
 			le.AutoCompleteEvent += (string prefix, int pos) =>
 			{
 				prefix = Regex.Match(prefix, "([^\\(\\)]+)$").ToString();
