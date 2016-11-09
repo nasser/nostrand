@@ -18,10 +18,10 @@ user>
 ## Usage
 
 ```
-nos FUNCTION [ARGUMENT...]
+nos [[KEY VALUE]...] FUNCTION [FUNCTION...]
 ```
 
-Nostrand does one thing: it runs a function. A function is either a Clojure function, or defined in C#. Some functions are built in.
+Nostrand does two things: it assembles arguments and runs functions. Arguments are keyword value pairs. Function are either a Clojure functions or C# methods. Some functions are built in.
 
 ```
 $ nos version
@@ -29,8 +29,11 @@ Nostrand 0.0.1.33392 (master/9e61e2f* Wed Jun 22 18:33:04 EDT 2016)
 Mono 4.4.1 (mono-4.4.0-branch-c7sr0/4747417 Mon Jun 20 15:43:48 EDT 2016)
 Clojure 1.7.0-master-SNAPSHOT
 
-$ nos repl
+$ nos cli-repl
 user> 
+
+$ nos repl
+Listening 0.0.0.0:11217
 ```
 
 In the future, you will be able to provide Nostrand with compiled functions written in C#.
@@ -40,7 +43,7 @@ But Nostrand is primarly meant to run namespace-qualified Clojure functions.
 ```
 $ cat foo.clj
 (ns foo)
-(defn bar [] (dotimes [i 5] (println (str "foobar: " i))))
+(defn bar [arg] (dotimes [i 5] (println (str "foobar: " i))))
 $ nos foo/bar
 foobar: 0
 foobar: 1
@@ -54,9 +57,9 @@ Additional command line arguments are passed to the function.
 ```
 $ cat foo.clj
 (ns foo)
-(defn bar [i]
-  (dotimes [j (int i)] (println (str "foobar: " j))))
-$ nos foo/bar 10
+(defn bar [{:keys [times]}]
+  (dotimes [j (int times)] (println (str "foobar: " j))))
+$ nos :times 10 foo/bar
 foobar: 0
 foobar: 1
 foobar: 2
