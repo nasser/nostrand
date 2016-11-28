@@ -51,16 +51,6 @@ namespace Nostrand
 
 		public static IFn FindFunction(string name)
 		{
-			// TODO stop using C# functions, they complicate things
-			var tasks = Tasks("mscorlib", "Clojure");
-			Type taskType;
-			if (tasks.TryGetValue(name, out taskType))
-			{
-				// c# task
-				return (IFn)Activator.CreateInstance(taskType);
-			}
-
-			// clojure task
 			try
 			{
 				if (name.Contains("/"))
@@ -71,6 +61,10 @@ namespace Nostrand
 					var taskVarName = taskParts[1];
 					RT.load(taskNS.Replace('.', '/'));
 					return RT.var(taskNS, taskVarName);
+				}
+				else
+				{
+					return RT.var("nostrand.tasks", name);
 				}
 			}
 			catch (NullReferenceException)
@@ -90,16 +84,6 @@ namespace Nostrand
 			return asm.GetName().Version + " " + asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 		}
 
-		static Dictionary<string, Type> Tasks(params string[] ignoring)
-		{
-			var ignoredAssemblies = ignoring.Select(s => Assembly.Load(s));
-			var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(assembly => !ignoredAssemblies.Contains(assembly));
-			var types = assemblies.SelectMany(assembly => assembly.GetTypes());
-			var tasks = types.Where(type => type.GetCustomAttribute<FunctionAttribute>() != null).
-							 ToDictionary(type => type.GetCustomAttribute<FunctionAttribute>().Name);
-			return tasks;
-		}
-
 		public static void Main(string[] args)
 		{
 			if (args.Length > 0)
@@ -113,12 +97,8 @@ namespace Nostrand
 				var input = ReadArguments(args);
 				object arg = input.options;
 
-				var builtinFunctions = PersistentVector.create(new SetLoadPathFunction(), new LoadAssembliesFunction());
-
-				foreach (var f in builtinFunctions)
-				{
-					arg = ((IFn)f).invoke(arg);
-				}
+				RT.load("nostrand/core");
+				RT.load("nostrand/tasks");
 
 				foreach (var f in input.functions)
 				{
@@ -129,14 +109,22 @@ namespace Nostrand
 						return;
 					}
 
-					arg = fn.invoke(arg);
+					try
+					{
+						arg = fn.invoke(arg);
+					}
+					catch (ArityException)
+					{
+						arg = fn.invoke();
+					}
 				}
 			}
+
 			else
 			{
-				Terminal.Message("Nostrand", Version());
-				Terminal.Message("Mono", GetMonoVersion());
-				Terminal.Message("Clojure", RT.var("clojure.core", "clojure-version").invoke());
+				Terminal.Message("Nostrand", Version(), ConsoleColor.White);
+				Terminal.Message("Mono", GetMonoVersion(), ConsoleColor.White);
+				Terminal.Message("Clojure", RT.var("clojure.core", "clojure-version").invoke(), ConsoleColor.White);
 			}
 		}
 	}

@@ -296,6 +296,11 @@ namespace Mono.Terminal {
 			if (home_row < 0)
 				home_row = 0;
 		}
+
+		public void SnapHomeRowToCursor()
+		{
+			home_row = Console.CursorTop;
+		}
 		
 
 		void RenderFrom (int pos)
@@ -666,6 +671,11 @@ namespace Mono.Terminal {
 				return;
 			}
 			done = true;
+		}
+
+		public void StopEdit()
+		{
+			edit_thread.Abort();
 		}
 
 		void CmdTabOrComplete ()
@@ -1042,6 +1052,7 @@ namespace Mono.Terminal {
 			edit_thread.Abort();
 		}
 
+
 		//
 		// Implements heuristics to show the completion window based on the mode
 		//
@@ -1170,7 +1181,7 @@ namespace Mono.Terminal {
 			Render ();
 			ForceCursor (cursor);
 		}
-		
+
 		public string Edit (string prompt, string initial)
 		{
 			edit_thread = Thread.CurrentThread;

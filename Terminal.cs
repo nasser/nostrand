@@ -20,7 +20,7 @@ namespace Nostrand
 				Console.Write (label + " ");
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine (content.ToString());
-//			Console.ForegroundColor = oldColor;
+			//Console.ForegroundColor = oldColor;
 			Console.ResetColor ();
 		}
 	}
