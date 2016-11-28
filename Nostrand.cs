@@ -80,7 +80,7 @@ namespace Nostrand
 
 		public static string Version()
 		{
-			var asm = Assembly.GetCallingAssembly();
+			var asm = typeof(Nostrand).Assembly;
 			return asm.GetName().Version + " " + asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 		}
 
@@ -88,11 +88,7 @@ namespace Nostrand
 		{
 			if (args.Length > 0)
 			{
-				new Thread(() =>
-				{
-					RT.load("clojure/core");
-					RT.load("clojure/repl");
-				}).Start();
+				RT.load("clojure/core");
 
 				var input = ReadArguments(args);
 				object arg = input.options;

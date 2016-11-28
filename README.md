@@ -10,8 +10,11 @@ Very early, pre-alpha. Everything will change. Don't use for anything critical.
 $ git clone https://github.com/nasser/nostrand.git
 $ cd nostrand
 $ xbuild
-$ ln -s ./bin/Debug/nos ~/bin/
-$ nos repl
+$ ln -s ./bin/Release/nos ~/bin/
+Nostrand 0.0.1.6940 (master/a1e4260* Mon Nov 28 03:51:20 EST 2016)
+Mono 4.8.0 (mono-4.8.0-branch/f5fbc32 Mon Nov 14 14:18:03 EST 2016)
+Clojure 1.7.0-master-SNAPSHOT
+REPL 0.0.0.0:11217
 user>
 ```
 
@@ -21,61 +24,61 @@ user>
 nos [[KEY VALUE]...] FUNCTION [FUNCTION...]
 ```
 
-Nostrand does two things: it assembles arguments and runs functions. Arguments are keyword value pairs. Function are either a Clojure functions or C# methods. Some functions are built in.
+Nostrand does two things: it assembles arguments and runs functions.
+
+Arguments are keyword value pairs. They all get merged into a single map that is passed through the functions. They can appear anywhere, and their order does not matter.
+
+Functions are Clojure functions. Without a namespace, they resolve to the `nostrand.tasks` namespace which is built in.
 
 ```
 $ nos version
-Nostrand 0.0.1.33392 (master/9e61e2f* Wed Jun 22 18:33:04 EDT 2016)
-Mono 4.4.1 (mono-4.4.0-branch-c7sr0/4747417 Mon Jun 20 15:43:48 EDT 2016)
+Nostrand 0.0.1.6940 (master/a1e4260* Mon Nov 28 03:51:20 EST 2016)
+Mono 4.8.0 (mono-4.8.0-branch/f5fbc32 Mon Nov 14 14:18:03 EST 2016)
 Clojure 1.7.0-master-SNAPSHOT
 
-$ nos cli-repl
-user> 
-
 $ nos repl
-Listening 0.0.0.0:11217
+Nostrand 0.0.1.6940 (master/a1e4260* Mon Nov 28 03:51:20 EST 2016)
+Mono 4.8.0 (mono-4.8.0-branch/f5fbc32 Mon Nov 14 14:18:03 EST 2016)
+Clojure 1.7.0-master-SNAPSHOT
+REPL 0.0.0.0:11217
+user>
 ```
 
-In the future, you will be able to provide Nostrand with compiled functions written in C#.
-
-But Nostrand is primarly meant to run namespace-qualified Clojure functions.
+With a namespace they are searched for using Clojure's normal namespace resolution machinery. The current directory is on the load path by default.
 
 ```
-$ cat foo.clj
-(ns foo)
-(defn bar [arg] (dotimes [i 5] (println (str "foobar: " i))))
-$ nos foo/bar
-foobar: 0
-foobar: 1
-foobar: 2
-foobar: 3
-foobar: 4
+$ cat tasks.clj
+(ns tasks)
+
+(defn build []
+  (binding [*compile-path* "build"]
+    (compile 'important.core)
+    (compile 'important.util)))
+
+$ nos tasks/build
 ```
 
-Additional command line arguments are passed to the function.
+Command line arguments are passed to the function, and appear as a map.
 
 ```
-$ cat foo.clj
-(ns foo)
-(defn bar [{:keys [times]}]
-  (dotimes [j (int times)] (println (str "foobar: " j))))
-$ nos :times 10 foo/bar
-foobar: 0
-foobar: 1
-foobar: 2
-foobar: 3
-foobar: 4
-foobar: 5
-foobar: 6
-foobar: 7
-foobar: 8
-foobar: 9
-```  
+$ cat tasks.clj
+(ns tasks)
 
-The load path is the current directory. Future releases will allow dependency and load path management.
+(defn build [{:keys [utils?]}]
+  (binding [*compile-path* "build"]
+    (compile 'important.core)
+    (when utils?
+      (compile 'important.util))))
+
+$ nos tasks/build :utils? true
+```
+
+If more functions are specified, they get called in order receiving the result of the previous function as input.
+
+Your entry namespace can also set up your classpath and, soon, your dependencies.  
 
 ## Name
-[Nostrand Avenue](https://en.wikipedia.org/wiki/Nostrand_Avenue) is a major street in Brooklyn near where I was living when I began the project.
+[Nostrand Avenue](https://en.wikipedia.org/wiki/Nostrand_Avenue) is a major street and subway stop in Brooklyn near where I was living when I began the project.
 
 ## Legal
 Copyright © 2016 Ramsey Nasser

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProjectGuid>{0569A87A-A14B-4100-9C5F-1D97F1209139}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Nostrand</RootNamespace>
     <AssemblyName>Nostrand</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -18,8 +18,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <PlatformTarget>x86</PlatformTarget>
-    <CustomCommands>
+    <PlatformTarget>x64</PlatformTarget>
+<!--     <CustomCommands>
       <CustomCommands>
         <Command>
           <type>BeforeBuild</type>
@@ -33,31 +33,25 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+ -->  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <PlatformTarget>x86</PlatformTarget>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>BeforeBuild</type>
-          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
+    <PlatformTarget>x64</PlatformTarget>
+    <PreBuildEvent>
+      /bin/sh ../../Scripts/pre-build.sh
+    </PreBuildEvent>
+    <PostBuildEvent>
+      /bin/sh ../../Scripts/post-build.sh
+    </PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Nostrand.cs" />
+    <Compile Include="Nostrand.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Terminal.cs" />
     <Compile Include="getline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +73,10 @@
       <Link>nostrand\core.clj</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Clojure\nostrand\bootstrap.clj">
+      <Link>nostrand\bootstrap.clj</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Clojure\nostrand\repl.clj">
       <Link>nostrand\repl.clj</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -87,10 +85,13 @@
       <Link>nostrand\tasks.clj</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="nos">
-      <Link>Scripts\nos</Link>
+    <Content Include="Scripts\nos">
+      <Link>nos</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

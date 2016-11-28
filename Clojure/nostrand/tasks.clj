@@ -14,16 +14,7 @@
    (Nostrand.Terminal/Message header body color)))
 
 (defn version [args]
-  (msg "Nostrand"
-       (let [asm (Assembly/Load "Nostrand")
-             version (.. asm GetName Version)
-             version-info (-> asm
-                              (.GetCustomAttributes
-                                AssemblyInformationalVersionAttribute
-                                true)
-                              first
-                              .InformationalVersion)]
-         (str version " " version-info)))
+  (msg "Nostrand" (Nostrand/Version))
   (msg "Mono" (Nostrand/GetMonoVersion))
   (msg "Clojure" (clojure-version))
   args)

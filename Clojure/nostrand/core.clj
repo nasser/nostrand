@@ -1,3 +1,5 @@
+(ns nostrand.core)
+
 ;; AVAILABLE IN NS FORM
 
 ;; TODO rename to e.g. nostrand.patch?
