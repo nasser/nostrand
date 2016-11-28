@@ -11,6 +11,7 @@ $ git clone https://github.com/nasser/nostrand.git
 $ cd nostrand
 $ xbuild
 $ ln -s ./bin/Release/nos ~/bin/
+$ nos repl
 Nostrand 0.0.1.6940 (master/a1e4260* Mon Nov 28 03:51:20 EST 2016)
 Mono 4.8.0 (mono-4.8.0-branch/f5fbc32 Mon Nov 14 14:18:03 EST 2016)
 Clojure 1.7.0-master-SNAPSHOT
