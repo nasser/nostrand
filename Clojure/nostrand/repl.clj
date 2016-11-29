@@ -68,37 +68,37 @@
             (let [^IPEndPoint sender (IPEndPoint. IPAddress/Any 0)
                   in-bytes (.Receive socket (by-ref sender))]
               (if (> (.Length in-bytes) 0)
-                (try 
-                  (let [in-code (.GetString Encoding/UTF8 in-bytes)
-                        result (-> in-code
-                                   read-string
-                                   eval
-                                   pr-str)
-                        out-str (str sb)
-                        out-bytes (.GetBytes Encoding/UTF8 out-str)
-                        response-bytes (.GetBytes Encoding/UTF8 (str in-code out-str result "\n" (prompt)))
-                        ]
-                    (.Send socket response-bytes (.Length response-bytes) sender)
-                    ;; cli print
-                    (Console/WriteLine)
-                    (Console/Write (prompt))
-                    (Console/Write in-code)
-                    (when-not (empty? out-str)
-                      (Terminal/Message (str sb) ConsoleColor/Gray))
-                    (Terminal/Message result ConsoleColor/Gray)
-                    (.SnapHomeRowToCursor line-editor)
-                    (.StopEdit line-editor)
-                    (.Clear sb))
-                  (catch Exception e
-                    (let [ex-bytes (.GetBytes Encoding/UTF8 (str e))]
-                      (.Send socket ex-bytes (.Length ex-bytes) sender)
+                (let [in-code (.GetString Encoding/UTF8 in-bytes)]
+                  (try 
+                    (let [result (-> in-code
+                                     read-string
+                                     eval
+                                     pr-str)
+                          out-str (str sb)
+                          out-bytes (.GetBytes Encoding/UTF8 out-str)
+                          response-bytes (.GetBytes Encoding/UTF8 (str in-code out-str result "\n" (prompt)))
+                          ]
+                      (.Send socket response-bytes (.Length response-bytes) sender)
                       ;; cli print
                       (Console/WriteLine)
                       (Console/Write (prompt))
-                      (Terminal/Message "Exception" (str e) ConsoleColor/Yellow)
+                      (Console/Write in-code)
+                      (when-not (empty? out-str)
+                        (Terminal/Message (str sb) ConsoleColor/Gray))
+                      (Terminal/Message result ConsoleColor/Gray)
                       (.SnapHomeRowToCursor line-editor)
                       (.StopEdit line-editor)
-                      (.Clear sb))))))
+                      (.Clear sb))
+                    (catch Exception e
+                      (let [ex-bytes (.GetBytes Encoding/UTF8 (str in-code e "\n" (prompt)))]
+                        (.Send socket ex-bytes (.Length ex-bytes) sender)
+                        ;; cli print
+                        (Console/WriteLine)
+                        (Console/Write (prompt))
+                        (Terminal/Message "Exception" (str e) ConsoleColor/Yellow)
+                        (.SnapHomeRowToCursor line-editor)
+                        (.StopEdit line-editor)
+                        (.Clear sb)))))))
             (catch SocketException e))
           (recur @socket-repl-running))))))
 
