@@ -22,12 +22,10 @@ user>
 ## Usage
 
 ```
-nos [[KEY VALUE]...] FUNCTION [FUNCTION...]
+nos FUNCTION [ARG...]
 ```
 
-Nostrand does two things: it assembles arguments and runs functions.
-
-Arguments are keyword value pairs. They all get merged into a single map that is passed through the functions. They can appear anywhere, and their order does not matter.
+Nostrand does one thing: it runs a function.
 
 Functions are Clojure functions. Without a namespace, they resolve to the `nostrand.tasks` namespace which is built in.
 
@@ -59,24 +57,38 @@ $ cat tasks.clj
 $ nos tasks/build
 ```
 
-Command line arguments are passed to the function, and appear as a map.
+Command line arguments are parsed as EDN passed to the function.
 
 ```
 $ cat tasks.clj
 (ns tasks)
 
-(defn build [{:keys [utils?]}]
+(defn build [utils?]
   (binding [*compile-path* "build"]
     (compile 'important.core)
     (when utils?
       (compile 'important.util))))
 
-$ nos tasks/build :utils? true
+$ nos tasks/build true
 ```
 
-If more functions are specified, they get called in order receiving the result of the previous function as input.
+Your entry namespace can also set up your classpath, load assemblies, and eventually manage dependencies.  
 
-Your entry namespace can also set up your classpath and, soon, your dependencies.  
+```
+$ cat tasks.clj
+(assembly-load-from "assemblies/SomeLib.dll")
+(ns tasks
+  (:import [SomeLib SomeType]))
+
+(defn build [utils?]
+  (SomeType/DoThing)
+  (binding [*compile-path* "build"]
+    (compile 'important.core)
+    (when utils?
+      (compile 'important.util))))
+
+$ nos tasks/build true
+```
 
 ## Name
 [Nostrand Avenue](https://en.wikipedia.org/wiki/Nostrand_Avenue) is a major street and subway stop in Brooklyn near where I was living when I began the project.
