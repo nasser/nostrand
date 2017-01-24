@@ -79,6 +79,11 @@ namespace Nostrand
 			return asm.GetName().Version + " " + asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 		}
 
+		public static string FileToRelativePath(string file)
+		{
+			return file.Replace(".clj", "").Replace(".cljc", "");
+		}
+
 		public static void Main(string[] args)
 		{
 			if (args.Length > 0)
@@ -88,15 +93,33 @@ namespace Nostrand
 				RT.load("nostrand/tasks");
 
 				var input = ReadArguments(args);
-				IFn fn = FindFunction(input.first().ToString());
+				var inputString = input.first().ToString();
+				if (inputString.IndexOf("./", StringComparison.InvariantCulture) == 0)
+					inputString = inputString.Substring(2);
+				IFn fn = FindFunction(inputString);
 
-				if (fn == null)
+				if (fn != null)
 				{
-					Terminal.Message("Quiting", "could not find function named `" + args[0] + "'", ConsoleColor.Yellow);
+					fn.applyTo(input.next());
 					return;
 				}
+				if (File.Exists(inputString))
+				{
+					try
+					{
+						IFn mainFn = FindFunction(FileToRelativePath(inputString) + "/-main");
+						if (mainFn != null)
+						{
+							mainFn.applyTo(input.next());
+							return;
+						}
+					}
+					catch (FileNotFoundException)
+					{
+					}
+				}
 
-				fn.applyTo(input.next());
+				Terminal.Message("Quiting", "could not find function or file named `" + args[0] + "'", ConsoleColor.Yellow);
 			}
 
 			else
