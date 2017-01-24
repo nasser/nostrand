@@ -111,8 +111,8 @@ namespace Nostrand
 						if (mainFn != null)
 						{
 							mainFn.applyTo(input.next());
-							return;
 						}
+						return;
 					}
 					catch (FileNotFoundException)
 					{
