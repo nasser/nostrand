@@ -13,38 +13,21 @@ namespace Nostrand
 
 	public class Nostrand
 	{
-		public struct Input
+		public static ISeq ReadArguments(string[] args)
 		{
-			public IPersistentMap options;
-			public PersistentVector functions;
-		}
+			ISeq list = new PersistentList.EmptyList(null);
 
-		public static Input ReadArguments(string[] args)
-		{
-			var input = new Input();
-			input.options = PersistentHashMap.EMPTY;
-			input.functions = PersistentVector.EMPTY;
-
-			var argString = string.Join(" ",args);
+			var argString = string.Join(" ", args.Reverse());
 			var pbtr = new PushbackTextReader(new StringReader(argString));
 			for (;;)
 			{
 				try
 				{
-					var o = ArgumentReader.read(pbtr, true, null, false, null);
-					if (o is Keyword)
-					{
-						var val = ArgumentReader.read(pbtr, true, null, false, null);
-						input.options = input.options.assoc(o, val);
-					}
-					else if(o is Symbol)
-					{
-						input.functions = (PersistentVector)input.functions.cons(o);
-					}
+					list = list.cons(ArgumentReader.read(pbtr, true, null, false, null));
 				}
 				catch (EndOfStreamException)
 				{
-					return input;
+					return list;
 				}
 			}
 		}
@@ -60,11 +43,23 @@ namespace Nostrand
 					var taskNS = taskParts[0];
 					var taskVarName = taskParts[1];
 					RT.load(taskNS.Replace('.', '/'));
-					return RT.var(taskNS, taskVarName);
+					var v = Namespace.find(Symbol.intern(taskNS)).FindInternedVar(Symbol.intern(taskVarName));
+					return v;
 				}
 				else
 				{
-					return RT.var("nostrand.tasks", name);
+					// namespace not given, check tasks
+					var tasksVar = Namespace.find(Symbol.intern("nostrand.tasks")).FindInternedVar(Symbol.intern(name));
+					if (tasksVar != null)
+						return tasksVar;
+					else
+					{
+						var coreVar = Namespace.find(Symbol.intern("clojure.core")).FindInternedVar(Symbol.intern(name));
+						if (coreVar != null)
+							return coreVar;
+						
+					}
+					return null;
 				}
 			}
 			catch (NullReferenceException)
@@ -89,31 +84,19 @@ namespace Nostrand
 			if (args.Length > 0)
 			{
 				RT.load("clojure/core");
-
-				var input = ReadArguments(args);
-				object arg = input.options;
-
 				RT.load("nostrand/core");
 				RT.load("nostrand/tasks");
 
-				foreach (var f in input.functions)
-				{
-					IFn fn = FindFunction(f.ToString());
-					if (fn == null)
-					{
-						Terminal.Message("Quiting", "could not find function named `" + args[0] + "'", ConsoleColor.Yellow);
-						return;
-					}
+				var input = ReadArguments(args);
+				IFn fn = FindFunction(input.first().ToString());
 
-					try
-					{
-						arg = fn.invoke(arg);
-					}
-					catch (ArityException)
-					{
-						arg = fn.invoke();
-					}
+				if (fn == null)
+				{
+					Terminal.Message("Quiting", "could not find function named `" + args[0] + "'", ConsoleColor.Yellow);
+					return;
 				}
+
+				fn.applyTo(input.next());
 			}
 
 			else
