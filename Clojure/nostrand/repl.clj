@@ -38,6 +38,15 @@
 
 (defonce cli-output-queue (Queue/Synchronized (Queue.)))
 
+(defn- random-port []
+  (int (+ 1024 (* (rand) (- UInt16/MaxValue 1024)))))
+
+(defn- available-socket [port]
+  (try
+    (UdpClient. (IPEndPoint. IPAddress/Any port))
+    (catch SocketException e
+      (available-socket (random-port)))))
+
 (defn socket [{:keys [line-editor
                       env
                       history
@@ -51,11 +60,11 @@
                     receive-buffer-size (* 1024 5000)
                     receive-timeout 100}
                :as args}]
-  (let [socket (UdpClient. (IPEndPoint. IPAddress/Any port))
+  (let [^UdpClient socket (available-socket port)
         sb (StringBuilder.)]
-    (set! (.. socket Client SendBufferSize) send-buffer-size)
-    (set! (.. socket Client ReceiveBufferSize) receive-buffer-size)
-    (set! (.. socket Client ReceiveTimeout) receive-timeout)
+    (set! (.. socket Client SendBufferSize) (int send-buffer-size))
+    (set! (.. socket Client ReceiveBufferSize) (int receive-buffer-size))
+    (set! (.. socket Client ReceiveTimeout) (int receive-timeout))
     (Terminal/Message "REPL" (.. socket Client LocalEndPoint) ConsoleColor/Blue)
     (.Start (Thread. (gen-delegate ThreadStart [] (cli args))))
     (binding [*ns* (find-ns 'user)

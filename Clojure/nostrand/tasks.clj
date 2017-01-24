@@ -29,7 +29,7 @@
 (defn repl
   ([]
    (version)
-   (repl/repl {}))
+   (repl/repl 11217))
   ([port]
    (version)
    (repl/repl port)))
