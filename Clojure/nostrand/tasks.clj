@@ -13,11 +13,10 @@
   ([header body color]
    (Nostrand.Terminal/Message header body color)))
 
-(defn version [args]
+(defn version []
   (msg "Nostrand" (Nostrand/Version))
   (msg "Mono" (Nostrand/GetMonoVersion))
-  (msg "Clojure" (clojure-version))
-  args)
+  (msg "Clojure" (clojure-version)))
 
 ;; TODO repls
 
@@ -27,6 +26,10 @@
 (defn socket-repl [args]
   (repl/socket args))
 
-(defn repl [args]
-  (version args)
-  (repl/repl args))
+(defn repl
+  ([]
+   (version)
+   (repl/repl {}))
+  ([port]
+   (version)
+   (repl/repl port)))

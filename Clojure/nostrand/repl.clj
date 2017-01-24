@@ -15,10 +15,10 @@
 
 (def socket-repl-running (atom true))
 
-(defn cli [{:keys [repl/history
-                   repl/line-editor
-                   repl/env]
-            :or {repl/history 500}
+(defn cli [{:keys [history
+                   line-editor
+                   env]
+            :or {history 500}
             :as args}]
   (binding [*ns* (find-ns 'user)
             *warn-on-reflection* *warn-on-reflection*
@@ -38,18 +38,18 @@
 
 (defonce cli-output-queue (Queue/Synchronized (Queue.)))
 
-(defn socket [{:keys [repl/line-editor
-                      repl/env
-                      repl/history
-                      repl/port
-                      repl/send-buffer-size
-                      repl/receive-buffer-size
-                      repl/receive-timeout]
-               :or {repl/history 500
-                    repl/port 11217
-                    repl/send-buffer-size (* 1024 5000)
-                    repl/receive-buffer-size (* 1024 5000)
-                    repl/receive-timeout 100}
+(defn socket [{:keys [line-editor
+                      env
+                      history
+                      port
+                      send-buffer-size
+                      receive-buffer-size
+                      receive-timeout]
+               :or {history 500
+                    port 11217
+                    send-buffer-size (* 1024 5000)
+                    receive-buffer-size (* 1024 5000)
+                    receive-timeout 100}
                :as args}]
   (let [socket (UdpClient. (IPEndPoint. IPAddress/Any port))
         sb (StringBuilder.)]
@@ -102,6 +102,6 @@
             (catch SocketException e))
           (recur @socket-repl-running))))))
 
-(defn repl [args]
-  (let [repl-args (merge args {:repl/line-editor (LineEditor. "nostrand" 500)})]
+(defn repl [port]
+  (let [repl-args {:port port :line-editor (LineEditor. "nostrand" 500)}]
     (.Start (Thread. (gen-delegate ThreadStart [] (socket repl-args))))))
