@@ -15,19 +15,19 @@ namespace Nostrand
 	{
 		public static ISeq ReadArguments(string[] args)
 		{
-			ISeq list = new PersistentList.EmptyList(null);
+			var list = PersistentVector.EMPTY; //PersistentList.EmptyList(null);
 
-			var argString = string.Join(" ", args.Reverse());
+			var argString = string.Join(" ", args);
 			var pbtr = new PushbackTextReader(new StringReader(argString));
 			for (;;)
 			{
 				try
 				{
-					list = list.cons(ArgumentReader.read(pbtr, true, null, false, null));
+					list = (PersistentVector)list.cons(ArgumentReader.read(pbtr, true, null, false, null));
 				}
 				catch (EndOfStreamException)
 				{
-					return list;
+					return list.seq();
 				}
 			}
 		}
