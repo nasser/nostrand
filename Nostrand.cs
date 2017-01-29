@@ -76,7 +76,9 @@ namespace Nostrand
 		public static string Version()
 		{
 			var asm = typeof(Nostrand).Assembly;
-			return asm.GetName().Version + " " + asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+			if (Assembly.Load("System").GetName().Version.Major == 2)
+				return asm.GetName().Version.ToString();
+			return asm.GetName().Version + " " + ((AssemblyInformationalVersionAttribute)(asm.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)[0])).InformationalVersion;
 		}
 
 		public static string FileToRelativePath(string file)
