@@ -94,7 +94,7 @@ $ nos tasks/build true
 [Nostrand Avenue](https://en.wikipedia.org/wiki/Nostrand_Avenue) is a major street and subway stop in Brooklyn near where I was living when I began the project.
 
 ## Legal
-Copyright © 2016 Ramsey Nasser
+Copyright © 2016-2017 Ramsey Nasser
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
