@@ -4,6 +4,7 @@
 
 ;; TODO rename to e.g. nostrand.patch?
 (in-ns 'clojure.core)
+(import [System.IO Path])
 
 (defn get-load-path []
   (Environment/GetEnvironmentVariable
@@ -24,6 +25,9 @@
   (Environment/SetEnvironmentVariable
     "MONO_PATH"
     val))
+
+(when-not (get-mono-path)
+  (set-mono-path "."))
 
 (defn add-load-path [path]
   (set-load-path
@@ -50,4 +54,4 @@
 
 (defn load-assemblies [& asms]
   (doseq [a asms]
-    (assembly-load a)))
+    (assembly-load-from a)))
