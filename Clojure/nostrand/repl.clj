@@ -13,7 +13,18 @@
 (defn- prompt []
   (str *ns* "> "))
 
+(defn- continue-prompt []
+  (let [l (dec (count (prompt)))]
+    (str (apply str (repeat l ".")) " ")))
+
 (def socket-repl-running (atom true))
+
+(defn balanced? [s]
+  (try 
+    (read-string s)
+    true
+    (catch EndOfStreamException e
+      false)))
 
 (defn cli [{:keys [history
                    line-editor
@@ -25,15 +36,18 @@
             *unchecked-math* *warn-on-reflection*]
     (loop [s (.Edit line-editor (prompt) "")]
       (when s
-        (try (-> s
-                 read-string
-                 eval
-                 pr-str
-                 (Terminal/Message ConsoleColor/Gray))
-          (catch EndOfStreamException e)
-          (catch Exception e
-            (Terminal/Message "Exception" (str e) ConsoleColor/Yellow)))
-        (recur (.Edit line-editor (prompt) "")))))
+        (if-not (balanced? s)
+          (recur (str s "\n" (.Edit line-editor (continue-prompt) "")))
+          (do
+            (try 
+              (-> s
+                  read-string
+                  eval
+                  pr-str
+                  (Terminal/Message ConsoleColor/Gray))
+              (catch Exception e
+                (Terminal/Message "Exception" (str e) ConsoleColor/Yellow)))
+            (recur (.Edit line-editor (prompt) "")))))))
   (reset! socket-repl-running false))
 
 (defonce cli-output-queue (Queue/Synchronized (Queue.)))
