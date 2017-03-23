@@ -18,7 +18,49 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget><!--     <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>BeforeBuild</type>
+          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
+ -->  <!--     <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>BeforeBuild</type>
+          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
+ -->  <!--     <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>BeforeBuild</type>
+          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
+ -->  
 <!--     <CustomCommands>
       <CustomCommands>
         <Command>
@@ -56,12 +98,16 @@
     <Compile Include="getline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ArgumentReader.cs" />
+    <Compile Include="AssemblyResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Clojure">
       <HintPath>References\Clojure.dll</HintPath>
     </Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\" />
@@ -69,12 +115,27 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="References\Clojure.dll" />
-    <Content Include="Clojure\nostrand\core.clj">
-      <Link>nostrand\core.clj</Link>
+    <Content Include="Scripts\nos">
+      <Link>nos</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Clojure\nostrand\deps\shell.clj">
+      <Link>nostrand\deps\shell.clj</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Clojure\nostrand\bootstrap.clj">
       <Link>nostrand\bootstrap.clj</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Clojure\nostrand\core.clj">
+      <Link>nostrand\core.clj</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Clojure\nostrand\deps.clj">
+      <Link>nostrand\deps.clj</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Clojure\nostrand\repl.clj">
@@ -85,13 +146,22 @@
       <Link>nostrand\tasks.clj</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\nos">
-      <Link>nos</Link>
+    <Content Include="Clojure\nostrand\deps\github.clj">
+      <Link>nostrand\deps\github.clj</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Content Include="Clojure\nostrand\deps\ipfs.clj">
+      <Link>nostrand\deps\ipfs.clj</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Clojure\nostrand\deps\maven.clj">
+      <Link>nostrand\deps\maven.clj</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Clojure\nostrand\deps\nuget.clj">
+      <Link>nostrand\deps\nuget.clj</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

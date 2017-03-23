@@ -32,7 +32,7 @@ namespace Nostrand
 			}
 		}
 
-		public static IFn FindFunction(string name)
+		public static Var FindFunction(string name)
 		{
 			try
 			{
@@ -57,7 +57,7 @@ namespace Nostrand
 						var coreVar = Namespace.find(Symbol.intern("clojure.core")).FindInternedVar(Symbol.intern(name));
 						if (coreVar != null)
 							return coreVar;
-						
+
 					}
 					return null;
 				}
@@ -92,16 +92,23 @@ namespace Nostrand
 			{
 				RT.load("clojure/core");
 				RT.load("nostrand/core");
+				RT.load("nostrand/bootstrap");
 				RT.load("nostrand/tasks");
 
 				var input = ReadArguments(args);
 				var inputString = input.first().ToString();
 				if (inputString.IndexOf("./", StringComparison.InvariantCulture) == 0)
 					inputString = inputString.Substring(2);
-				IFn fn = FindFunction(inputString);
+
+				Var.pushThreadBindings(RT.mapUniqueKeys(RT.CurrentNSVar, Namespace.find(Symbol.intern("nostrand.core"))));
+
+				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
+
+				Var fn = FindFunction(inputString);
 
 				if (fn != null)
 				{
+					//referAll.invoke(fn.Namespace, nostrandCore);
 					fn.applyTo(input.next());
 					return;
 				}
