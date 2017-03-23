@@ -90,10 +90,31 @@ namespace Nostrand
 		{
 			if (args.Length > 0)
 			{
+				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
+
+				RuntimeBootstrapFlag._doRTBootstrap = false;
 				RT.load("clojure/core");
 				RT.load("nostrand/core");
-				RT.load("nostrand/bootstrap");
 				RT.load("nostrand/tasks");
+
+				Var.pushThreadBindings(RT.mapUniqueKeys(RT.CurrentNSVar, RT.CurrentNSVar.deref()));
+				try
+				{
+					Symbol USER = Symbol.intern("user");
+					Symbol CLOJURE = Symbol.intern("clojure.core");
+					Symbol CORE = Symbol.intern("nostrand.core");
+
+					Var in_ns = RT.var("clojure.core", "in-ns");
+					Var refer = RT.var("clojure.core", "refer");
+					in_ns.invoke(USER);
+					refer.invoke(CLOJURE);
+					refer.invoke(CORE);
+					RT.LoadCljScript("user.clj", false);
+				}
+				finally
+				{
+					Var.popThreadBindings();
+				}
 
 				var input = ReadArguments(args);
 				var inputString = input.first().ToString();
@@ -101,34 +122,38 @@ namespace Nostrand
 					inputString = inputString.Substring(2);
 
 				Var.pushThreadBindings(RT.mapUniqueKeys(RT.CurrentNSVar, Namespace.find(Symbol.intern("nostrand.core"))));
-
-				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
-
-				Var fn = FindFunction(inputString);
-
-				if (fn != null)
+				try
 				{
-					//referAll.invoke(fn.Namespace, nostrandCore);
-					fn.applyTo(input.next());
-					return;
-				}
-				if (File.Exists(inputString))
-				{
-					try
+					Var fn = FindFunction(inputString);
+
+					if (fn != null)
 					{
-						IFn mainFn = FindFunction(FileToRelativePath(inputString) + "/-main");
-						if (mainFn != null)
-						{
-							mainFn.applyTo(input.next());
-						}
+						//referAll.invoke(fn.Namespace, nostrandCore);
+						fn.applyTo(input.next());
 						return;
 					}
-					catch (FileNotFoundException)
+					if (File.Exists(inputString))
 					{
+						try
+						{
+							IFn mainFn = FindFunction(FileToRelativePath(inputString) + "/-main");
+							if (mainFn != null)
+							{
+								mainFn.applyTo(input.next());
+							}
+							return;
+						}
+						catch (FileNotFoundException)
+						{
+						}
 					}
-				}
 
-				Terminal.Message("Quiting", "could not find function or file named `" + args[0] + "'", ConsoleColor.Yellow);
+					Terminal.Message("Quiting", "could not find function or file named `" + args[0] + "'", ConsoleColor.Yellow);
+				}
+				finally
+				{
+					Var.popThreadBindings();
+				}
 			}
 
 			else
