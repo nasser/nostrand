@@ -50,4 +50,4 @@
                      ns-publics
                      vals)]
         (doseq [f fns]
-          (clojure.repl/print-doc (meta f)))))))
+          ((var clojure.repl/print-doc) (meta f)))))))
