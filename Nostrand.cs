@@ -93,28 +93,18 @@ namespace Nostrand
 				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
 
 				RuntimeBootstrapFlag._doRTBootstrap = false;
+
 				RT.load("clojure/core");
 				RT.load("nostrand/core");
 				RT.load("nostrand/tasks");
 
-				Var.pushThreadBindings(RT.mapUniqueKeys(RT.CurrentNSVar, RT.CurrentNSVar.deref()));
-				try
+				if (File.Exists("project.edn"))
 				{
-					Symbol USER = Symbol.intern("user");
-					Symbol CLOJURE = Symbol.intern("clojure.core");
-					Symbol CORE = Symbol.intern("nostrand.core");
+					var projectEdn = EdnReader.readString(File.ReadAllText("project.edn"), PersistentHashMap.EMPTY);
+					RT.var("nostrand.core", "establish-environment").invoke(projectEdn);
+				}
 
-					Var in_ns = RT.var("clojure.core", "in-ns");
-					Var refer = RT.var("clojure.core", "refer");
-					in_ns.invoke(USER);
-					refer.invoke(CLOJURE);
-					refer.invoke(CORE);
-					RT.LoadCljScript("user.clj", false);
-				}
-				finally
-				{
-					Var.popThreadBindings();
-				}
+				RT.PostBootstrapInit();
 
 				var input = ReadArguments(args);
 				var inputString = input.first().ToString();
