@@ -70,3 +70,16 @@
   `(do
      ~@(map (fn [coord] `(depend* deps/*options* '~coord))
             coords)))
+
+(defn establish-environment [{:keys [source-paths assembly-paths dependencies references]
+                              :as config}]
+  (def configuration config)
+  (when source-paths
+    (apply load-path source-paths))
+  (when assembly-paths
+    (apply assembly-path assembly-paths))
+  (when dependencies
+    (doseq [d dependencies]
+      (depend* deps/*options* d)))
+  (when references
+    (reference* references)))
