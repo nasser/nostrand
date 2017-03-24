@@ -4,9 +4,12 @@
   nostrand.tasks
   (:import
     [Nostrand Nostrand]
+    [System.IO Directory]
     [System.Threading Thread ThreadStart]
     [System.Reflection AssemblyInformationalVersionAttribute])
-  (:require [nostrand.repl :as repl]))
+  (:require [nostrand.repl :as repl]
+            [clojure.string :as string]
+            clojure.repl))
 
 (defn- msg
   ([header body]
@@ -32,3 +35,19 @@
   ([port]
    (version)
    (repl/repl port)))
+
+(defn tasks []
+  (let [ns-syms
+        (->> (Directory/GetFiles "." "*.clj")
+             (map #(-> %
+                       (string/replace "./" "")
+                       (string/replace ".clj" "")
+                       symbol)))]
+    (doseq [s ns-syms]
+      (require s)
+      (let [fns (->> s
+                     find-ns
+                     ns-publics
+                     vals)]
+        (doseq [f fns]
+          (clojure.repl/print-doc (meta f)))))))
