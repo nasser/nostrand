@@ -16,7 +16,7 @@
         url (str "https://github.com/" github-user "/" github-repo "/archive/" branch ".zip")
         prefix (str root "/" (name head) "/" github-user)
         temp-name (str (gensym (str github-user "-" github-repo)) ".zip")]
-    (when-not (Directory/Exists prefix)
+    (when-not (Directory/Exists (str prefix "/" github-repo "-" branch))
       (in-dir prefix
               (. (WebClient.) (DownloadFile url temp-name))
               (ZipFile/ExtractToDirectory temp-name ".")

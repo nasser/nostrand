@@ -277,7 +277,8 @@
   [{:keys [root] :as opts}
    [head id version & coord-opts]]
   (let [prefix (str root "/" (name head))]
-    (install [id version] prefix)))
+    (when-not (Directory/Exists prefix)
+      (install [id version] prefix))))
 
 (defmethod paths :maven 
   [{:keys [root] :as opts} coord]
