@@ -9,6 +9,7 @@
     [System.Reflection AssemblyInformationalVersionAttribute])
   (:require [nostrand.repl :as repl]
             [clojure.string :as string]
+            [clojure.core.server :as clj-server]
             clojure.repl))
 
 (defn- msg
@@ -51,3 +52,15 @@
                      vals)]
         (doseq [f fns]
           ((var clojure.repl/print-doc) (meta f)))))))
+
+
+(defn clojure-socket-repl [args]
+  (print "Starting Clojure socket repl...")
+  (let [opts (merge
+              {:accept `clj-server/repl
+               :name "Clojure socket repl"}
+              args)]
+    (clj-server/start-server opts)
+    (println "done ")
+    (println "Started socket repl with Options: " opts)
+    (repl)))
