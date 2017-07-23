@@ -90,6 +90,38 @@ $ cat tasks.clj
 $ nos tasks/build true
 ```
 
+### `project.edn`
+If a file named `project.edn` is present in the current directory, it will be parsed at startup to configure initialization. It is expected to be an EDN map, and the following keys are recognized:
+
+* `:source-paths` A vector of paths to load Clojure namespaces from. The default is the current directory.
+* `:assembly-paths` A vector of paths to load assemblies from.
+* `:references` A vector of assembly names to reference.
+* `:dependencies` A vector of package coordinates your project depends on
+
+### Dependencies
+*Support for dependencies is very new and likely buggy. Please take out issues as you encounter them.*
+
+Nostrand supports packages from Maven Central and Clojars, as well as github and NuGet. `project.edn`'s `:dependencies` key accepts a vector of package coordinates of the form `[source name version]` , where `source` is a keyword that specifies which repository to pull from, `name` is a symbol that specifies the name of the package, and `version` is a string that specifies the verison of the package. `name` and `version` will depend on the `source`.
+
+For example, the MAGIC project's `project.edn` contains
+
+```clojure
+:dependencies [[:github nasser/mage "master"]
+               [:github nasser/test.check "master"]
+               [:maven org.clojure/tools.analyzer "0.6.9"]]
+```
+
+#### `:github`
+Github sources clones a whole repository as a dependency. `name` takes the form `username/repository` and `version` is anything that refers to a commit, like a branch name, a tag, or a full commit hash.
+
+The root of the repository is the only directory added to the load path by default, but you can specify subdirectories by adding `:paths` followed by a vector of strings to the coordinate.
+
+#### `:nuget`
+`name` and `version` are the same as you would pass in to `nuget install name -Version version`.
+
+#### `:maven`
+Behaves as in Leiningen. Note that many Clojure packages will not work on ClojurCLR without modification, as they may reference Java classes that are not present on the CLR.
+
 ## Name
 [Nostrand Avenue](https://en.wikipedia.org/wiki/Nostrand_Avenue) is a major street and subway stop in Brooklyn near where I was living when I began the project.
 
