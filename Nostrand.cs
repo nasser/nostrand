@@ -90,8 +90,6 @@ namespace Nostrand
 		{
 			if (args.Length > 0)
 			{
-				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
-
 				RuntimeBootstrapFlag._doRTBootstrap = false;
 
 				RT.load("clojure/core");
@@ -110,6 +108,8 @@ namespace Nostrand
 				var inputString = input.first().ToString();
 				if (inputString.IndexOf("./", StringComparison.InvariantCulture) == 0)
 					inputString = inputString.Substring(2);
+
+				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
 
 				Var.pushThreadBindings(RT.mapUniqueKeys(RT.CurrentNSVar, Namespace.find(Symbol.intern("nostrand.core"))));
 				try
