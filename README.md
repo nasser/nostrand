@@ -103,7 +103,7 @@ If a file named `project.edn` is present in the current directory, it will be pa
 
 Nostrand supports packages from Maven Central and Clojars, as well as github and NuGet. `project.edn`'s `:dependencies` key accepts a vector of package coordinates of the form `[source name version]` , where `source` is a keyword that specifies which repository to pull from, `name` is a symbol that specifies the name of the package, and `version` is a string that specifies the verison of the package. `name` and `version` will depend on the `source`.
 
-For example, the MAGIC project's `project.edn` contains
+For example, the [MAGIC project's](https://github.com/nasser/magic) [`project.edn`](https://github.com/nasser/magic/blob/master/project.edn) contains:
 
 ```clojure
 :dependencies [[:github nasser/mage "master"]
