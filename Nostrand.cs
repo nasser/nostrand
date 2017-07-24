@@ -96,6 +96,8 @@ namespace Nostrand
 				RT.load("nostrand/core");
 				RT.load("nostrand/tasks");
 
+				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
+				
 				if (File.Exists("project.edn"))
 				{
 					var projectEdn = EdnReader.readString(File.ReadAllText("project.edn"), PersistentHashMap.EMPTY);
@@ -108,8 +110,6 @@ namespace Nostrand
 				var inputString = input.first().ToString();
 				if (inputString.IndexOf("./", StringComparison.InvariantCulture) == 0)
 					inputString = inputString.Substring(2);
-
-				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
 
 				Var.pushThreadBindings(RT.mapUniqueKeys(RT.CurrentNSVar, Namespace.find(Symbol.intern("nostrand.core"))));
 				try
