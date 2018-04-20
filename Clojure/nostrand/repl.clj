@@ -21,7 +21,7 @@
 
 (defn balanced? [s]
   (try 
-    (read-string s)
+    (read-string {:read-cond :allow} s)
     true
     (catch EndOfStreamException e
       false)))
@@ -40,8 +40,7 @@
           (recur (str s "\n" (.Edit line-editor (continue-prompt) "")))
           (do
             (try 
-              (-> s
-                  read-string
+              (-> (read-string {:read-cond :allow} s)
                   eval
                   pr-str
                   (Terminal/Message ConsoleColor/Gray))
@@ -93,8 +92,7 @@
               (if (> (.Length in-bytes) 0)
                 (let [in-code (.GetString Encoding/UTF8 in-bytes)]
                   (try 
-                    (let [result (-> in-code
-                                     read-string
+                    (let [result (-> (read-string {:read-cond :allow} in-code)
                                      eval
                                      pr-str)
                           out-str (str sb)
