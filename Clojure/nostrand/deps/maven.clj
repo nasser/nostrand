@@ -276,10 +276,11 @@
 (defmethod acquire! :maven 
   [{:keys [root] :as opts}
    [head id version & coord-opts]]
-  (let [prefix (str root "/" (name head))]
+  (let [prefix (str root "/" (name head) "/" id "-" version)]
     (when-not (Directory/Exists prefix)
       (install [id version] prefix))))
 
 (defmethod paths :maven 
-  [{:keys [root] :as opts} coord]
-  [(str root "/maven")])
+  [{:keys [root] :as opts} 
+   [head id version & opts]]
+  [(str root "/" (name head) "/" id "-" version)])
