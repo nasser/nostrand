@@ -17,7 +17,7 @@ using System.Runtime.CompilerServices;
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-[assembly: AssemblyVersion("0.0.1.*")]
+[assembly: AssemblyVersion("0.1.0.*")]
 // Overwritten during build
 [assembly: AssemblyInformationalVersion("")]
 
