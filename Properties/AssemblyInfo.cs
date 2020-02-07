@@ -1,29 +1,7 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-
-// Information about this assembly is defined by the following attributes. 
-// Change them to the values specific to your project.
 
 [assembly: AssemblyTitle("Nostrand")]
-[assembly: AssemblyDescription("Standalone MonoClojure Tool")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyDescription("Clojure on Mono")]
 [assembly: AssemblyCopyright("Ramsey Nasser")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
-// The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
-// The form "{Major}.{Minor}.*" will automatically update the build and revision,
-// and "{Major}.{Minor}.{Build}.*" will update just the revision.
-
-[assembly: AssemblyVersion("0.1.0.*")]
-// Overwritten during build
-[assembly: AssemblyInformationalVersion("")]
-
-// The following attributes are used to specify the signing key for the assembly, 
-// if desired. See the Mono documentation for more information about signing.
-
-//[assembly: AssemblyDelaySign(false)]
-//[assembly: AssemblyKeyFile("")]
-
+[assembly: AssemblyVersion("0.2.1.0")]
+[assembly: AssemblyInformationalVersion("(master/4ff980e* Wed 05 Feb 2020 06:51:23 PM EST)")]

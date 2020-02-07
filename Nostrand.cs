@@ -88,6 +88,7 @@ namespace Nostrand
 
 		public static void Main(string[] args)
 		{
+			new Mono.Terminal.LineEditor("#force-mono.terminal-assembly-load#");
 			if (args.Length > 0)
 			{
 				RuntimeBootstrapFlag._doRTBootstrap = false;

@@ -1,167 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
-    <ProjectGuid>{0569A87A-A14B-4100-9C5F-1D97F1209139}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Nostrand</RootNamespace>
-    <AssemblyName>Nostrand</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFramework>net471</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <PlatformTarget>x64</PlatformTarget><!--     <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>BeforeBuild</type>
-          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
- -->  <!--     <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>BeforeBuild</type>
-          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
- -->  <!--     <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>BeforeBuild</type>
-          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
- -->  
-<!--     <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>BeforeBuild</type>
-          <command>/bin/sh Scripts/patch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>/bin/sh Scripts/unpatch-assembly-info.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
- -->  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <PlatformTarget>x64</PlatformTarget>
-    <PreBuildEvent>
-      /bin/sh ../../Scripts/pre-build.sh
-    </PreBuildEvent>
-    <PostBuildEvent>
-      /bin/sh ../../Scripts/post-build.sh
-    </PostBuildEvent>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="Nostrand.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Terminal.cs" />
-    <Compile Include="getline.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ArgumentReader.cs" />
-    <Compile Include="AssemblyResolver.cs" />
+    <Content Include="nostrand/**/*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
   </ItemGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" PrivateAssets="All" />
+    <PackageReference Include="Mono.Terminal" Version="5.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Clojure">
-      <HintPath>References\Clojure.dll</HintPath>
+      <HintPath>References/Clojure.dll</HintPath>
     </Reference>
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Scripts\" />
-    <Folder Include="References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="References\Clojure.dll" />
-    <Content Include="Scripts\nos">
-      <Link>nos</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Clojure\nostrand\deps\shell.clj">
-      <Link>nostrand\deps\shell.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\bootstrap.clj">
-      <Link>nostrand\bootstrap.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\core.clj">
-      <Link>nostrand\core.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\deps.clj">
-      <Link>nostrand\deps.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\repl.clj">
-      <Link>nostrand\repl.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\tasks.clj">
-      <Link>nostrand\tasks.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\deps\github.clj">
-      <Link>nostrand\deps\github.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\deps\ipfs.clj">
-      <Link>nostrand\deps\ipfs.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\deps\maven.clj">
-      <Link>nostrand\deps\maven.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Clojure\nostrand\deps\nuget.clj">
-      <Link>nostrand\deps\nuget.clj</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="PreBuild" BeforeTargets="Build">
+    <Exec Command="sh Scripts/patch-assembly-info.sh" />
+  </Target>
+  <Target Name="PostBuild" AfterTargets="Build">
+    <Exec Command="sh Scripts/unpatch-assembly-info.sh" />
+    <Exec Command="sh Scripts/aot-assemblies.sh $(OutDir)" Condition="'$(Configuration)'=='Release'" />
+  </Target>
 </Project>
