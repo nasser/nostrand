@@ -22,6 +22,7 @@ namespace Nostrand
 			Console.WriteLine (content.ToString());
 			//Console.ForegroundColor = oldColor;
 			Console.ResetColor ();
+			Console.SetCursorPosition(0, Math.Min(Console.CursorTop+1, Console.WindowHeight-1));
 		}
 	}
 }
