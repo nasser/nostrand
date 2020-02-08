@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Scripts/nos" Link="nos" CopyToOutputDirectory="PreserveNewest"  />
     <Content Include="nostrand/**/*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>  
