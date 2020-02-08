@@ -9,12 +9,12 @@ Very early, pre-alpha. Everything will change. Don't use for anything critical.
 ```
 $ git clone https://github.com/nasser/nostrand.git
 $ cd nostrand
-$ xbuild
-$ ln -s `pwd`/bin/Release/nos ~/bin/
+$ dotnet build -c Release
+$ ln -s `pwd`/bin/x64/Release/net471/nos ~/bin/
 $ nos repl
-Nostrand 0.0.1.6940 (master/a1e4260* Mon Nov 28 03:51:20 EST 2016)
-Mono 4.8.0 (mono-4.8.0-branch/f5fbc32 Mon Nov 14 14:18:03 EST 2016)
-Clojure 1.7.0-master-SNAPSHOT
+Nostrand 0.2.1.0 (master/4115065 Sat 08 Feb 2020 05:50:17 PM EST)
+Mono 6.4.0 (makepkg/fe64a4765e6 Sat 16 Nov 2019 04:59:42 PM UTC)
+Clojure 1.10.0-master-SNAPSHOT
 REPL 0.0.0.0:11217
 user>
 ```
