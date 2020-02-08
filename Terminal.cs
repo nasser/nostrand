@@ -22,7 +22,15 @@ namespace Nostrand
 			Console.WriteLine (content.ToString());
 			//Console.ForegroundColor = oldColor;
 			Console.ResetColor ();
-			Console.SetCursorPosition(0, Math.Min(Console.CursorTop+1, Console.WindowHeight-1));
+			// due to some bug in mono we need to compute the cursor offset
+			// ourselves otherwise Mono.Terminal breaks
+			var fullMessage = label != null ? "${label} ${content}" : content.ToString();
+			int newLines = 0;
+			foreach (var line in fullMessage.Split(new char['\n']))
+			{
+				newLines += 1 + (line.Length / Console.WindowWidth);
+			}
+			Console.SetCursorPosition(0, Math.Min(Console.CursorTop+newLines, Console.WindowHeight-1));
 		}
 	}
 }
