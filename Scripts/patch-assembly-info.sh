@@ -2,5 +2,4 @@
 # cd ../../
 DIRTY=$([[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]] && echo "*")
 INFO=$(echo "(`git rev-parse --abbrev-ref HEAD`\/`git describe --always`$DIRTY `date`)")
-# echo "$INFO"
-sed -i-unpatched "s/AssemblyInformationalVersion.*/AssemblyInformationalVersion(\"$INFO\")]/g" Properties/AssemblyInfo.cs
+sed -i "s/AssemblyInformationalVersion.*/AssemblyInformationalVersion(\"$INFO\")]/g" Properties/AssemblyInfo.cs

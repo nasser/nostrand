@@ -1,2 +1,2 @@
 # unpatch AssemblyInfo
-mv Properties/AssemblyInfo.cs-unpatched Properties/AssemblyInfo.cs
+sed -i "s/AssemblyInformationalVersion.*/AssemblyInformationalVersion(\"\")]/g" Properties/AssemblyInfo.cs
