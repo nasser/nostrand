@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project InitialTargets="PreBuild" Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net471</TargetFramework>
@@ -23,7 +23,7 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="Build">
+  <Target Name="PreBuild">
     <Exec Command="sh Scripts/patch-assembly-info.sh" />
   </Target>
   <Target Name="PostBuild" AfterTargets="Build">
