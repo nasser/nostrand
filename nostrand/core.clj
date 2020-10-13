@@ -28,7 +28,12 @@
 (defn update-load-path []
   (Environment/SetEnvironmentVariable
     "CLOJURE_LOAD_PATH"
-    (string/join Path/PathSeparator @-load-path)))
+    (string/join Path/PathSeparator @-load-path))
+  (alter-var-root #'*load-paths*
+                  (fn [load-paths]
+                    (mapv
+                     #(System.IO.Path/GetFullPath %)
+                     (concat @-load-path load-paths)))))
 
 (defn set-load-path [val]
   (reset! -load-path val)

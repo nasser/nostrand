@@ -70,8 +70,8 @@ namespace Nostrand
 			return null;
 		}
 
-		[DllImport("__Internal", EntryPoint = "mono_get_runtime_build_info")]
-		public extern static string GetMonoVersion();
+		// [DllImport("__Internal", EntryPoint = "mono_get_runtime_build_info")]
+		// public extern static string GetRuntimeVersion();
 
 		public static string Version()
 		{
@@ -86,17 +86,42 @@ namespace Nostrand
 			return file.Replace(".clj", "").Replace(".cljc", "");
 		}
 
+		static void BootClojureAndNostrand()
+		{
+			var assemblyPath = Path.GetDirectoryName(Assembly.Load("Clojure").Location);
+			foreach(var cljDll in Directory.EnumerateFiles(assemblyPath, "*.clj.dll"))
+			{
+				// Terminal.Message("[loading]", cljDll, ConsoleColor.DarkGray);
+				Assembly.LoadFile(cljDll);
+			}
+
+			// Terminal.Message("[booting]", "runtime", ConsoleColor.DarkGray);
+			RT.Initialize(doRuntimePostBoostrap: false);
+			// Terminal.Message("[booting]", "clojure/core", ConsoleColor.DarkGray);
+			RT.TryLoadInitType("clojure/core");
+			// Terminal.Message("[booting]", "magic/api", ConsoleColor.DarkGray);
+			RT.TryLoadInitType("magic/api");
+
+			// Terminal.Message("[booting]", "establishing root bindings", ConsoleColor.DarkGray);
+			RT.var("clojure.core", "*eval-form-fn*").bindRoot(RT.var("magic.api", "eval"));
+			RT.var("clojure.core", "*load-file-fn*").bindRoot(RT.var("magic.api", "runtime-load-file"));
+			RT.var("clojure.core", "*compile-file-fn*").bindRoot(RT.var("magic.api", "runtime-compile-file"));
+
+			// var loadFunction = RT.var("clojure.core", "*load-fn*");
+			// Terminal.Message("[loading]", "nostrand/core", ConsoleColor.DarkGray);
+			// loadFunction.invoke("nostrand/core");
+			RT.TryLoadInitType("nostrand/core");
+			// Terminal.Message("[loading]", "nostrand/tasks", ConsoleColor.DarkGray);
+			// loadFunction.invoke("nostrand/tasks");
+			RT.TryLoadInitType("nostrand/tasks");
+		}
+
 		public static void Main(string[] args)
 		{
 			new Mono.Terminal.LineEditor("#force-mono.terminal-assembly-load#");
+			BootClojureAndNostrand();
 			if (args.Length > 0)
 			{
-				RuntimeBootstrapFlag._doRTBootstrap = false;
-
-				RT.load("clojure/core");
-				RT.load("nostrand/core");
-				RT.load("nostrand/tasks");
-
 				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
 				
 				if (File.Exists("project.edn"))
@@ -150,7 +175,7 @@ namespace Nostrand
 			else
 			{
 				Terminal.Message("Nostrand", Version(), ConsoleColor.White);
-				Terminal.Message("Mono", GetMonoVersion(), ConsoleColor.White);
+				// Terminal.Message("Mono", GetRuntimeVersion(), ConsoleColor.White);
 				Terminal.Message("Clojure", RT.var("clojure.core", "clojure-version").invoke(), ConsoleColor.White);
 			}
 		}

@@ -20,7 +20,7 @@
 
 (defn version []
   (msg "Nostrand" (Nostrand/Version))
-  (msg "Mono" (Nostrand/GetMonoVersion))
+  ;; (msg "Mono" (Nostrand/GetMonoVersion))
   (msg "Clojure" (clojure-version)))
 
 (defn cli-repl [args]

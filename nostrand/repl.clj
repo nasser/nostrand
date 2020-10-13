@@ -8,7 +8,7 @@
     [System.Net IPEndPoint IPAddress]
     [System.Net.Sockets UdpClient SocketException]
     [Nostrand Nostrand Terminal] 
-    ; [Mono.Terminal LineEditor]
+    [Mono.Terminal LineEditor]
     ))
 
 (defn- prompt []

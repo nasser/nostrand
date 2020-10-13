@@ -1,4 +1,5 @@
-<Project InitialTargets="PreBuild" Sdk="Microsoft.NET.Sdk">
+<!-- <Project InitialTargets="PreBuild" Sdk="Microsoft.NET.Sdk"> -->
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net471</TargetFramework>
@@ -6,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Scripts/nos" Link="nos" CopyToOutputDirectory="PreserveNewest"  />
+    <!-- <Content Include="Scripts/nos" Link="nos" CopyToOutputDirectory="PreserveNewest"  /> -->
     <Content Include="nostrand/**/*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>  
@@ -18,16 +19,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Clojure">
-      <HintPath>References/Clojure.dll</HintPath>
-    </Reference>
+    <Reference Include="References/*.dll" />
   </ItemGroup>
 
-  <Target Name="PreBuild">
+  <!-- <Target Name="PreBuild">
     <Exec Command="sh Scripts/patch-assembly-info.sh" />
   </Target>
   <Target Name="PostBuild" AfterTargets="Build">
     <Exec Command="sh Scripts/unpatch-assembly-info.sh" />
     <Exec Command="sh Scripts/aot-assemblies.sh $(OutDir)" Condition="'$(Configuration)'=='Release'" />
-  </Target>
+  </Target> -->
 </Project>
