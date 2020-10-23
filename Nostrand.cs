@@ -91,29 +91,24 @@ namespace Nostrand
 			var assemblyPath = Path.GetDirectoryName(Assembly.Load("Clojure").Location);
 			foreach(var cljDll in Directory.EnumerateFiles(assemblyPath, "*.clj.dll"))
 			{
-				// Terminal.Message("[loading]", cljDll, ConsoleColor.DarkGray);
 				Assembly.LoadFile(cljDll);
 			}
 
-			// Terminal.Message("[booting]", "runtime", ConsoleColor.DarkGray);
 			RT.Initialize(doRuntimePostBoostrap: false);
-			// Terminal.Message("[booting]", "clojure/core", ConsoleColor.DarkGray);
 			RT.TryLoadInitType("clojure/core");
-			// Terminal.Message("[booting]", "magic/api", ConsoleColor.DarkGray);
 			RT.TryLoadInitType("magic/api");
 
-			// Terminal.Message("[booting]", "establishing root bindings", ConsoleColor.DarkGray);
+			RT.var("clojure.core", "*load-fn*").bindRoot(RT.var("clojure.core", "-load"));
 			RT.var("clojure.core", "*eval-form-fn*").bindRoot(RT.var("magic.api", "eval"));
 			RT.var("clojure.core", "*load-file-fn*").bindRoot(RT.var("magic.api", "runtime-load-file"));
 			RT.var("clojure.core", "*compile-file-fn*").bindRoot(RT.var("magic.api", "runtime-compile-file"));
+			RT.var("clojure.core", "*macroexpand-1-fn*").bindRoot(RT.var("magic.api", "runtime-macroexpand-1"));
 
 			// var loadFunction = RT.var("clojure.core", "*load-fn*");
-			// Terminal.Message("[loading]", "nostrand/core", ConsoleColor.DarkGray);
 			// loadFunction.invoke("nostrand/core");
-			RT.TryLoadInitType("nostrand/core");
-			// Terminal.Message("[loading]", "nostrand/tasks", ConsoleColor.DarkGray);
+			RT.var("clojure.core", "*load-fn*").invoke("nostrand/core");
 			// loadFunction.invoke("nostrand/tasks");
-			RT.TryLoadInitType("nostrand/tasks");
+			RT.var("clojure.core", "*load-fn*").invoke("nostrand/tasks");
 		}
 
 		public static void Main(string[] args)

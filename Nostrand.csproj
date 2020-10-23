@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
@@ -19,7 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="References/*.dll" />
+    <Reference Include="references/*.dll" />
+    <Reference Include="references-netstandard/*.dll" Condition="'$(TargetFramework)' == 'netcoreapp3.0'" />
+    <Reference Include="references-net4x/*.dll" Condition="'$(TargetFramework)' == 'net471'" />
   </ItemGroup>
 
   <!-- <Target Name="PreBuild">

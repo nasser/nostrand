@@ -23,8 +23,10 @@
   ;; (msg "Mono" (Nostrand/GetMonoVersion))
   (msg "Clojure" (clojure-version)))
 
-(defn cli-repl [args]
-  (repl/cli args))
+(defn cli-repl
+  ([] (cli-repl nil))
+  ([args]
+   (repl/cli args)))
 
 (defn socket-repl [args]
   (repl/socket args))

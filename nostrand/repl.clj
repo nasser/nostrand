@@ -30,7 +30,8 @@
 (defn cli [{:keys [history
                    line-editor
                    env]
-            :or {history 500}
+            :or {history 500
+                 line-editor (LineEditor. "nostrand" 500)}
             :as args}]
   (binding [*ns* (find-ns 'user)
             *warn-on-reflection* *warn-on-reflection*
