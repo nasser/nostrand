@@ -20,7 +20,8 @@
 (defn resolve-assembly-load [asm]
   (let [candidates (for [prefix @-assembly-path
                          ext ["" ".dll" ".exe"]]
-                     (Path/Combine prefix (str asm ext)))
+                     (let [file-name (-> asm (string/split (re-pattern (str ","))) first)]
+                       (Path/Combine prefix (str file-name ext))))
         full-asm-path (first (filter #(File/Exists %) candidates))]
     (when full-asm-path
       (assembly-load-from full-asm-path))))
