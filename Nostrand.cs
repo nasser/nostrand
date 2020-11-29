@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -118,6 +118,8 @@ namespace Nostrand
 			if (args.Length > 0)
 			{
 				AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.Resolve;
+
+				RT.var("nostrand.core", "load-path").invoke(Directory.GetCurrentDirectory());
 				
 				if (File.Exists("project.edn"))
 				{
