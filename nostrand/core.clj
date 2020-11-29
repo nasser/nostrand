@@ -61,7 +61,7 @@
 (defn reference* [asms]
   (doseq [asm asms]
     (let [a (str asm)]
-      (assembly-load a))))
+      (assembly-load-from a))))
 
 (defmacro reference [& asms]
   `(reference* ~(mapv str asms)))
