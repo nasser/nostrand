@@ -2,12 +2,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net471;net5.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Scripts/nos-core" Link="nos" CopyToOutputDirectory="PreserveNewest" Condition="'$(TargetFramework)' == 'netcoreapp3.0'" />
+    <Content Include="Scripts/nos-core" Link="nos" CopyToOutputDirectory="PreserveNewest" Condition="'$(TargetFramework)' == 'net5.0'" />
     <Content Include="Scripts/nos-framework" Link="nos" CopyToOutputDirectory="PreserveNewest" Condition="'$(TargetFramework)' == 'net471'" />
     <Content Include="nostrand/**/*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <Reference Include="references/*.dll" />
-    <Reference Include="references-netstandard/*.dll" Condition="'$(TargetFramework)' == 'netcoreapp3.0'" />
+    <Reference Include="references-netstandard/*.dll" Condition="'$(TargetFramework)' == 'net5.0'" />
     <Reference Include="references-net4x/*.dll" Condition="'$(TargetFramework)' == 'net471'" />
   </ItemGroup>
 
