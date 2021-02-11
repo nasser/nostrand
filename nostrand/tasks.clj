@@ -34,10 +34,12 @@
 (defn repl
   ([]
    (version)
-   (repl/repl 11217))
+   #_ (repl/repl 11217)
+   (cli-repl))
   ([port]
    (version)
-   (repl/repl port)))
+   #_ (repl/repl port)
+   (cli-repl)))
 
 (defn tasks []
   (let [ns-syms
