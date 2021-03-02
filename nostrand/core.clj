@@ -1,10 +1,11 @@
 (ns
-  ^{:author "Ramsey Nasser"
-    :doc "Core nostrand API containing load path, assemblies, and dependency functions."}
-  nostrand.core
+    ^{:author "Ramsey Nasser"
+      :doc "Core nostrand API containing load path, assemblies, and dependency functions."}
+    nostrand.core
   (:require [clojure.string :as string]
             [nostrand.deps :as deps]
             nostrand.deps.github
+            nostrand.deps.gitlab
             nostrand.deps.maven
             nostrand.deps.nuget)
   (:import [System.IO Path File]))
