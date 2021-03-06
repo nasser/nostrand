@@ -45,7 +45,7 @@ user>
 
 With a namespace they are searched for using Clojure's normal namespace resolution machinery. The current directory is on the load path by default.
 
-```
+```clojure
 $ cat tasks.clj
 (ns tasks)
 
@@ -59,7 +59,7 @@ $ nos tasks/build
 
 Command line arguments are parsed as EDN passed to the function.
 
-```
+```clojure
 $ cat tasks.clj
 (ns tasks)
 
@@ -74,7 +74,7 @@ $ nos tasks/build true
 
 Your entry namespace can also set up your classpath, load assemblies, and eventually manage dependencies.  
 
-```
+```clojure
 $ cat tasks.clj
 (assembly-load-from "assemblies/SomeLib.dll")
 (ns tasks
@@ -112,7 +112,19 @@ For example, the [MAGIC project's](https://github.com/nasser/magic) [`project.ed
 ```
 
 #### `:github`
-Github sources clones a whole repository as a dependency. `name` takes the form `username/repository` and `version` is anything that refers to a commit, like a branch name, a tag, or a full commit hash.
+Github sources clone a whole repository as a dependency. `name` takes the form `username/repository` and `version` is anything that refers to a commit, like a branch name, a tag, or a full commit hash.
+
+#### `:gitlab`
+Gitlab sources clone a whole repository as a dependency. `name` takes the form `username/repository` and `version` is the branch name. The `sha` and the `project-id` must be provided as well for public and private repository. For private repository, `domain` and access `token` are required as well. Here is an example of a gitlab private dependency:
+
+```clojure
+[:gitlab loic/my-lib "master"
+ :paths ["src"]
+ :sha "08f78dec3po452272cr2d2eb2ea85778ff2ce1d6"
+ :token "xxxxxxxxxxxxx"
+ :domain "dev.hello.sg"
+ :project-id "777"]
+```
 
 The root of the repository is the only directory added to the load path by default, but you can specify subdirectories by adding `:paths` followed by a vector of strings to the coordinate.
 
