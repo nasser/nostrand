@@ -6,8 +6,23 @@ Very early, pre-alpha. Everything will change. Don't use for anything critical.
 
 ## Installing
 
+1. clone the `nostrand` repo
+
 ```
 $ git clone https://github.com/nasser/nostrand.git
+```
+
+2. Fetch the last `magic` dlls
+
+Go to [nasser/magic/actions](https://github.com/nasser/magic/actions).
+
+Click on the last worflow run, scroll down and download the artifact `magic-assemblies`.
+
+Copy the dlls inside the `nostrand/references` folder.
+
+3. Build and REPL
+
+```
 $ cd nostrand
 $ dotnet build -c Release
 $ ln -s `pwd`/bin/x64/Release/net471/nos ~/bin/
