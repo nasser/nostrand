@@ -114,7 +114,6 @@ If a file named `project.edn` is present in the current directory, it will be pa
 * `:dependencies` A vector of package coordinates your project depends on
 
 ### Dependencies
-*Support for dependencies is very new and likely buggy. Please take out issues as you encounter them.*
 
 Nostrand supports packages from Maven Central and Clojars, as well as github and NuGet. `project.edn`'s `:dependencies` key accepts a vector of package coordinates of the form `[source name version]` , where `source` is a keyword that specifies which repository to pull from, `name` is a symbol that specifies the name of the package, and `version` is a string that specifies the verison of the package. `name` and `version` will depend on the `source`.
 
@@ -127,7 +126,13 @@ For example, the [MAGIC project's](https://github.com/nasser/magic) [`project.ed
 ```
 
 #### `:github`
-Github sources clone a whole repository as a dependency. `name` takes the form `username/repository` and `version` is anything that refers to a commit, like a branch name, a tag, or a full commit hash.
+Github sources clone a whole repository as a dependency. `name` takes the form `username/repository` and `version` is anything that refers to a commit, like a branch name, a tag, or a full commit hash. For private repo, the `token`, branch and `sha` must be provided. Here is an example of a github public dependency:
+```clojure
+[:github loic/my-lib "master"
+ :paths ["src"]
+ :sha "46bb12e33ae4fe118a1aa91d2985f1f2f3192366"
+ :token "xxxxxxxxxxxxx"]
+```
 
 #### `:gitlab`
 Gitlab sources clone a whole repository as a dependency. `name` takes the form `username/repository` and `version` is the branch name. The `sha` and the `project-id` must be provided as well for public and private repository. For private repository, `domain` and access `token` are required as well. Here is an example of a gitlab private dependency:
