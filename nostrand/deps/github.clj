@@ -18,7 +18,7 @@
     (and user repo branch sha) ;; public repo via sha
     (str "https://github.com/" user "/" repo "/archive/" sha ".zip")
 
-    (and user repo branch) ;; public repo via branch
+    (and user repo branch) ;; public repo via default branch
     (str "https://github.com/" user "/" repo "/archive/" branch ".zip")
 
     :else

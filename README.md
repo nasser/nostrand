@@ -126,24 +126,45 @@ For example, the [MAGIC project's](https://github.com/nasser/magic) [`project.ed
 ```
 
 #### `:github`
-Github sources clone a whole repository as a dependency. `name` takes the form `username/repository` and `version` is anything that refers to a commit, like a branch name, a tag, or a full commit hash. For private repo, the `token`, branch and `sha` must be provided. Here is an example of a github public dependency:
+Github sources clone a whole repository as a dependency.
+
+- `name` takes the form `username/repository` and `version` is anything that refers to a commit (sha recommended).
+- You must provide both `branch` and `sha` if you want to download the zip of a specific branch.
+- For private repo, the `token` must be provided and the `sha`.
+- Be careful with GitHub personal token has they cannot be set to read only! (For your private GitHub repo, it is advised to create a dummy account with read-only access on your repos and generate the token from this dummy user.)
+
 ```clojure
-[:github loic/my-lib "master"
- :paths ["src"]
- :sha "46bb12e33ae4fe118a1aa91d2985f1f2f3192366"
- :token "xxxxxxxxxxxxx"]
+[;; public repo
+ [:github skydread1/my-public-lib "feature-1"
+  :sha "46bb12e33ae4fe118a1aa91d2985f1f2f3192366"
+  :paths ["src"]]
+ ;; private repo
+ [:github skydread1/my-private-lib "master"
+  :paths ["src"]
+  :sha "46bb12e33ae4fe118a1aa91d2985f1f2f3192367"
+  :token "xxxxxxxxxxxxx"]]
 ```
 
 #### `:gitlab`
-Gitlab sources clone a whole repository as a dependency. `name` takes the form `username/repository` and `version` is the branch name. The `sha` and the `project-id` must be provided as well for public and private repository. For private repository, `domain` and access `token` are required as well. Here is an example of a gitlab private dependency:
+Gitlab sources clone a whole repository as a dependency.
+
+- `name` takes the form `username/repository` and `version` is  anything that refers to a commit (sha recommended).
+- The `branch`, `sha` and the `project-id` must be provided for public and private repository.
+- For private repository, `domain` and access `token` are required as well.
 
 ```clojure
-[:gitlab loic/my-lib "master"
- :paths ["src"]
- :sha "08f78dec3po452272cr2d2eb2ea85778ff2ce1d6"
- :token "xxxxxxxxxxxxx"
- :domain "dev.hello.sg"
- :project-id "777"]
+[;; public repo
+ [:gitlab skydread1/my-public-lib "master"
+  :paths ["src"]
+  :sha "46bb12e33ae4fe118a1aa91d2985f1f2f3192366"
+  :project-id "777"]
+ ;; private repo
+ [:gitlab skydread1/my-private-lib "master"
+  :paths ["src"]
+  :sha "46bb12e33ae4fe118a1aa91d2985f1f2f3192367"
+  :token "xxxxxxxxxxxxx"
+  :domain "dev.hello.sg"
+  :project-id "888"]]
 ```
 
 The root of the repository is the only directory added to the load path by default, but you can specify subdirectories by adding `:paths` followed by a vector of strings to the coordinate.
