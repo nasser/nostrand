@@ -74,3 +74,22 @@
                        (current-framework-version))
         lib-path (path-combine [libs-path best-moniker])]
     [lib-path]))
+
+;;; Pack and Push NuGet Packages
+
+(defn pack-and-push-nuget
+  "Packs the dlls from the `*compile-path*` to a NuGet package in `bin/Release` and push it to online repo.
+   prerequisite: you need to add at the root of the project:
+   - A `.csproj`     : dependency manager
+   - A `.nuspec`     : package manager
+   - A `nuget.config`: host repo credentials (keep this file locally)"
+  [git-host-type]
+  (println "packing...")
+  (let [{:keys [exit out err]} (sh "dotnet" "pack --configuration Release")]
+    (when (= 1 exit)
+      (throw (ex-info "error while packing" {:out out :err err}))))
+  (println "pushing to " git-host-type "...")
+  (let [{:keys [exit out err]} (sh "dotnet"
+                                   (str "nuget push bin/Release/*.nupkg --source " git-host-type))]
+    (when (= 1 exit)
+      (throw (ex-info "error while pushing" {:out out :err err})))))
