@@ -37,14 +37,14 @@
   (->> versions
        sort
        (take-while
-         #(Version/op_LessThanOrEqual % target-version))
+        #(Version/op_LessThanOrEqual % target-version))
        last))
 
 (defn latest-useable-moniker [monikers target-version]
   (->> monikers
        sort ;; ??
        (take-while
-         #(Version/op_LessThanOrEqual (moniker->version %) target-version))
+        #(Version/op_LessThanOrEqual (moniker->version %) target-version))
        last))
 
 (defn supported-framework-monikers [lib-folder]
@@ -70,7 +70,29 @@
         supported-monikers (->> libs-path
                                 supported-framework-monikers)
         best-moniker (latest-useable-moniker
-                       supported-monikers
-                       (current-framework-version))
+                      supported-monikers
+                      (current-framework-version))
         lib-path (path-combine [libs-path best-moniker])]
     [lib-path]))
+
+;;; Pack and Push NuGet Packages
+
+(defn pack-and-push-nuget
+  "Packs the dlls and push it to the online repo.
+   prerequisite: you need to add at the root of the project:
+   - A `.csproj`     : dependency manager
+   - A `.nuspec`     : package manager
+   - A `nuget.config`: host repo credentials (keep this file locally)"
+  [git-host-type & {:keys [with-build? configuration]
+                    :or   {with-build? true configuration "Release"}}]
+  (println "packing...")
+  (let [{:keys [exit out err]} (sh "dotnet" (str "pack --configuration " configuration
+                                                 (when-not with-build? " --no-build")))]
+    (when (= 1 exit)
+      (throw (ex-info "error while packing" {:out out :err err}))))
+  (println "pushing to " git-host-type "...")
+  (let [{:keys [exit out err]} (sh "dotnet"
+                                   (str "nuget push bin/" configuration "/*.nupkg "
+                                        "--source " git-host-type))]
+    (when (= 1 exit)
+      (throw (ex-info "error while pushing" {:out out :err err})))))
