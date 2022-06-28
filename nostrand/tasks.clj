@@ -1,13 +1,14 @@
 (ns
-  ^{:author "Ramsey Nasser"
-    :doc "Built in nostrand tasks, available from the command line as unqualified functions"}
-  nostrand.tasks
+    ^{:author "Ramsey Nasser"
+      :doc    "Built in nostrand tasks, available from the command line as unqualified functions"}
+    nostrand.tasks
   (:import
-    [Nostrand Nostrand]
-    [System.IO Directory]
-    [System.Threading Thread ThreadStart]
-    [System.Reflection AssemblyInformationalVersionAttribute])
+   [Nostrand Nostrand]
+   [System.IO Directory]
+   [System.Threading Thread ThreadStart]
+   [System.Reflection AssemblyInformationalVersionAttribute])
   (:require [nostrand.repl :as repl]
+            [nostrand.deps.nuget :as nuget]
             [clojure.string :as string]
             [clojure.core.server :as clj-server]
             clojure.repl))
@@ -68,3 +69,14 @@
     (println "done ")
     (println "Started socket repl with Options: " opts)
     (repl)))
+
+(defn nuget-push
+  "Pack and Push NuGet Package to git host repo.
+  - `git-host`     : 'github' or 'gitlab'
+  - `with-build?`  : true by default
+  - `configuration`: 'Release' by default."
+  [git-host-type with-build? configuration]
+  (binding [*compile-path* "build"]
+    (nuget/pack-and-push-nuget git-host-type
+                               :with-build? with-build?
+                               :configuration configuration)))
