@@ -2,8 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net471;net5.0</TargetFrameworks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFrameworks>net471;net6.0</TargetFrameworks>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,9 +22,20 @@
 
   <ItemGroup>
     <Reference Include="references/*.dll" />
-    <Reference Include="references-netstandard/*.dll" Condition="'$(TargetFramework)' == 'net5.0'" />
+    <Reference Include="references-netstandard/*.dll" Condition="'$(TargetFramework)' == 'net6.0'" />
     <Reference Include="references-net4x/*.dll" Condition="'$(TargetFramework)' == 'net471'" />
   </ItemGroup>
+
+  <Target Name="SetSourceRevisionId" BeforeTargets="InitializeSourceControlInformation">
+    <Exec 
+      Command="git describe --long --always --exclude=* --abbrev=8"
+      StandardOutputImportance="low"
+      ConsoleToMSBuild="True"
+      IgnoreExitCode="False"
+      >
+      <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput"/>
+    </Exec>
+  </Target>
 
   <!-- <Target Name="PreBuild">
     <Exec Command="sh Scripts/patch-assembly-info.sh" />
