@@ -21,7 +21,8 @@
 
 (defn version []
   (msg "Nostrand" (Nostrand/Version))
-  ;; (msg "Mono" (Nostrand/GetMonoVersion))
+  (msg "Clojure.Runtime" (Nostrand/ClojureRuntimeVersion))
+  (msg "Magic.Runtime" (Nostrand/MagicRuntimeVersion))
   (msg "Clojure" (clojure-version)))
 
 (defn cli-repl
