@@ -1,15 +1,14 @@
 (ns nostrand.repl
-  (:require [clojure.string :as string])
-  (:import 
-    [System.IO StringWriter EndOfStreamException]
-    [System.Collections Queue]
-    [System.Text Encoding StringBuilder]
-    [System.Threading Thread ThreadStart]
-    [System.Net IPEndPoint IPAddress]
-    [System.Net.Sockets UdpClient SocketException]
-    [Nostrand Nostrand Terminal] 
-    [Mono.Terminal LineEditor]
-    ))
+  (:require [magic.flags :as mflags])
+  (:import
+   [System.IO StringWriter EndOfStreamException]
+   [System.Collections Queue]
+   [System.Text Encoding StringBuilder]
+   [System.Threading Thread ThreadStart]
+   [System.Net IPEndPoint IPAddress]
+   [System.Net.Sockets UdpClient SocketException]
+   [Nostrand Terminal]
+   [Mono.Terminal LineEditor]))
 
 (defn- prompt []
   (str *ns* "> "))
@@ -21,27 +20,27 @@
 (def socket-repl-running (atom true))
 
 (defn balanced? [s]
-  (try 
+  (try
     (read-string {:read-cond :allow} s)
     true
     (catch EndOfStreamException e
       false)))
 
-(defn cli [{:keys [history
-                   line-editor
-                   env]
-            :or {history 500
-                 line-editor (LineEditor. "nostrand" 500)}
-            :as args}]
-  (binding [*ns* (find-ns 'user)
-            *warn-on-reflection* *warn-on-reflection*
-            *unchecked-math* *warn-on-reflection*]
+(defn cli [{:keys [history line-editor env magic-modes]
+            :or   {history     500
+                   line-editor (LineEditor. "nostrand" 500)}
+            :as   args}]
+  (binding [*ns*                              (find-ns 'user)
+            *warn-on-reflection*              *warn-on-reflection*
+            *unchecked-math*                  *warn-on-reflection*
+            mflags/*strongly-typed-invokes*   (->> magic-modes (some #{:strongly-typed-mode}) boolean)
+            mflags/*legacy-dynamic-callsites* (->> magic-modes (some #{:legacy-mode}) boolean)]
     (loop [s (.Edit line-editor (prompt) "")]
       (when s
         (if-not (balanced? s)
           (recur (str s "\n" (.Edit line-editor (continue-prompt) "")))
           (do
-            (try 
+            (try
               (-> (read-string {:read-cond :allow} s)
                   eval
                   pr-str

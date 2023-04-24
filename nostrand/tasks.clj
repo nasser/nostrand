@@ -28,6 +28,7 @@
 (defn cli-repl
   ([] (cli-repl nil))
   ([args]
+   (version)
    (repl/cli args)))
 
 (defn socket-repl [args]
